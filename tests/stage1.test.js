@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {area} from '../geometry.js';
-import {stageOneOptions,stageOneSVG} from '../stage1.js';
+import {stageOneOptions,stageOneSVG,proposedLine} from '../stage1.js';
 const scenarios=JSON.parse(fs.readFileSync(new URL('../data/scenarios.json',import.meta.url)));
 test('all five cases produce three finite massing candidates',()=>{
   for(const site of scenarios){
@@ -48,4 +48,30 @@ test('overbuild remains optional, never treated as authorized',()=>{
     assert.ok(extra.areas.excessFootprint>0);
     assert.equal(base.areas.excessFootprint,0);
   }
+});
+
+test('construction line constrains all massing to its inward side',()=>{
+  for(const site of scenarios){
+    const chosen=proposedLine(site);
+    for(const i of [chosen.edgeIndex,0]){
+      const config={buildingLine:{edgeIndex:i,offsetM:2,source:'demo-assumption'}};
+      const options=stageOneOptions(site,config);
+      assert.ok(options.length>0,site.id);
+      for(const option of options){
+        const l=option.assumptions.buildingLine;
+        const origin=l.start[0]*l.inward[0]+l.start[1]*l.inward[1];
+        for(const p of option.footprint){
+          assert.ok(p[0]*l.inward[0]+p[1]*l.inward[1]>=origin-1e-6,site.id+option.id);
+        }
+        assert.equal(l.edgeIndex,i);
+        assert.equal(l.offsetM,2);
+        assert.equal(option.assumptions.legalStatus,'illustrative line, NOT sourced from municipality');
+      }
+    }
+    assert.equal(stageOneOptions(site,{buildingLine:{edgeIndex:999,offsetM:0}}).length,0);
+  }
+});
+test('impossible offset never silently shifts construction elsewhere',()=>{
+  const site=scenarios[0];
+  assert.deepEqual(stageOneOptions(site,{buildingLine:{edgeIndex:2,offsetM:100}}),[]);
 });
