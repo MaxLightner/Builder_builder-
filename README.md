@@ -49,3 +49,10 @@ Neighbor volumes use a fixed 8 m illustrative depth; open-space strips use 10 m 
 - A per-site opt-in toggle labelled **پیشروی / ساخت مازاد** allows an additional 0–35 **percentage points** above 65%. The default on activation is +10 percentage points, i.e. 75% site coverage. This is not a claim of legal entitlement, fine payment eligibility, or approval; real municipal rules must be verified separately.
 - Baseline and optional excess area, actual coverage, site area, and geometries are included in exported Design JSON. Site-specific toggle settings are stored only in browser localStorage.
 - All parking, core, vehicle circulation and structural shapes remain **illustrative placeholders**; current area compliance checks do not make the candidate a valid building or parking plan.
+
+## Construction-start line / رج شروع بنا (Stage 1 v0.4)
+
+- Building placement is now **anchored to a selected construction-start line**. The user selects a plot boundary edge and an inward distance in metres. Every generated footprint must remain on the inward side of this line, and attempts with no buildable remainder produce no option rather than relocating the yard or building.
+- The initial choice for each synthetic scenario is the northernmost plot edge, marked visibly as a **demo assumption**, not a real municipal building line. Checking *مطابق دستور نقشه* records only **user attestation**, not system verification. The municipal designation cannot be inferred from site geometry.
+- All A/B/C variants use the **same selected line** and target the same 65% area cap; B/C optionally free a narrow side strip only if sufficient area remains. Thus their current geometry is a constrained visual experiment, not independent architectural design.
+- A complex official build-to line may require explicit surveyed endpoints or a polyline rather than the current edge-plus-offset input. The prototype does not yet solve this or design constructible rough-in / سفت‌کاری, parking maneuver, structural layout or vertical access.
