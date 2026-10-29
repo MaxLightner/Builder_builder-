@@ -1,4 +1,4 @@
-# Building Lab — Stage 0 + Stage 1
+# Building Lab — Stage 0 + Stage 1 Rough Structure
 
 محیط آزمایشی مرحله‌ای طراحی ساختمان، بدون API هوش مصنوعی و بدون Solver. رابط فارسی و راست‌به‌چپ، پنج سناریوی واقع‌نما، پلان SVG و مدل WebGL با Three.js و OrbitControls.
 
@@ -56,3 +56,17 @@ Neighbor volumes use a fixed 8 m illustrative depth; open-space strips use 10 m 
 - The initial choice for each synthetic scenario is the northernmost plot edge, marked visibly as a **demo assumption**, not a real municipal building line. Checking *مطابق دستور نقشه* records only **user attestation**, not system verification. The municipal designation cannot be inferred from site geometry.
 - All A/B/C variants use the **same selected line** and target the same 65% area cap; B/C optionally free a narrow side strip only if sufficient area remains. Thus their current geometry is a constrained visual experiment, not independent architectural design.
 - A complex official build-to line may require explicit surveyed endpoints or a polyline rather than the current edge-plus-offset input. The prototype does not yet solve this or design constructible rough-in / سفت‌کاری, parking maneuver, structural layout or vertical access.
+
+## Stage 1 v0.5 — structural concept, not a simple massing diagram
+
+A deterministic experimental rough-structure model is attached to every Stage 1 design under `design.structure`. For every site/option, the viewer shows:
+
+- Individual slab polygons at 0, 3.2, … metres, including parking ground, N *assumed* residential storeys, and roof (the initial scenario target is treated as residential floors above a parking ground).
+- A permanent vertical column-grid proposal, simple beam connectivity and coordinated vertical shafts.
+- Separate stairwell, lift-shaft, landing and service-shaft placeholder boxes.
+- Parking stalls (2.5 × 5 m) adjacent to a nominal 5.5 m aisle, selected only when geometric footprint, fixed structural columns, core and a preliminary street-to-aisle line do not conflict.
+- Per-scheme count of **preliminarily screened stalls**. A count of zero means this narrow solver found no candidate, **not** that a skilled architect could not fit vehicles. Vehicle turning/swept paths and municipal parking dimensions remain unvalidated.
+- Ground / typical floors / roof viewer selection; toggles for slabs, columns/beams, core, and parking; area and count dashboard.
+- Exported Design JSON contains columns with coordinates and sections, slabs and elevations, approximate beams, core polygons, parking bay polygons and count, and explicit incomplete-engineering validation flags.
+
+**Not delivered:** engineered structural calculations, confirmed column/beam section sizes, actual stair flights and risers, lift technical dimensions, fire egress, ramps/basements, turning-envelope simulation, full-code compliance, architectural room walls or a construction-ready structural drawing. The three A/B/C strategies remain comparative *concept* schemes, not approved options. Never treat the number of cars as an official permit capacity.
