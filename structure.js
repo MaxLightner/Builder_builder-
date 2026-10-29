@@ -79,29 +79,42 @@ function parkingCandidates(footprint,core,columns,plot,gate){
         polyRect(b.minX+.2,b.minY+offset,w-.4,aisleWidth):
         polyRect(b.minX+offset,b.minY+.2,aisleWidth,h-.4);
       if(!within(footprint,a)||physicalObstacles.some(c=>overlaps(a,c,.03)))continue;
-      const stalls=[];
-      for(const side of [-1,1]){
-        const row=horizontal?
-          side===1?b.minY+offset+aisleWidth:b.minY+offset-stallDepth:
-          side===1?b.minX+offset+aisleWidth:b.minX+offset-stallDepth;
-        const count=Math.floor((axisLength-.45)/stallWidth);
-        for(let i=0;i<count;i++){
-          const axis=horizontal?b.minX+.22+i*stallWidth:b.minY+.22+i*stallWidth;
-          const p=horizontal?polyRect(axis,row,stallWidth,stallDepth):polyRect(row,axis,stallDepth,stallWidth);
-          if(!within(footprint,p)||physicalObstacles.some(c=>overlaps(p,c,.08))||stalls.some(c=>overlaps(p,c.polygon,.02)))continue;
-          stalls.push({id:'P'+(stalls.length+1),polygon:p,kind:'perpendicular-90',dimensions:[2.5,5],independent:true,orientation:horizontal?'N-S':'E-W'});
+      for(const shift of [.22,.36,.5,.7,.88]){
+        const stalls=[];
+        for(const side of [-1,1]){
+          const row=horizontal?
+            side===1?b.minY+offset+aisleWidth:b.minY+offset-stallDepth:
+            side===1?b.minX+offset+aisleWidth:b.minX+offset-stallDepth;
+          const count=Math.floor((axisLength-shift-.2)/stallWidth);
+          for(let i=0;i<count;i++){
+            const axis=horizontal?b.minX+shift+i*stallWidth:b.minY+shift+i*stallWidth;
+            const p=horizontal?polyRect(axis,row,stallWidth,stallDepth):polyRect(row,axis,stallDepth,stallWidth);
+            if(!within(footprint,p)||physicalObstacles.some(c=>overlaps(p,c,.04))||stalls.some(c=>overlaps(p,c.polygon,.02)))continue;
+            stalls.push({id:'P'+(stalls.length+1),polygon:p,kind:'perpendicular-90',dimensions:[2.5,5],independent:true,orientation:horizontal?'N-S':'E-W'});
+          }
         }
+        if(!stalls.length)continue;
+        const ab=bounds(a);
+        const target=gate?[
+          Math.max(ab.minX+.4,Math.min(ab.maxX-.4,gate[0])),
+          Math.max(ab.minY+.4,Math.min(ab.maxY-.4,gate[1]))
+        ]:center(a);
+        const entry=gate||null;
+        const corridor=entry?[entry,target]:[];
+        const collisionOnPath=physicalObstacles.some(ob=>{
+          const r=bounds(ob);
+          for(const [start,end] of corridor.length>=2?[[corridor[0],corridor[1]]]:[]){
+            for(let t=0;t<=1.0001;t+=.035){
+              const x=start[0]+(end[0]-start[0])*t,y=start[1]+(end[1]-start[1])*t;
+              if(x>r.minX-.14&&x<r.maxX+.14&&y>r.minY-.14&&y<r.maxY+.14)return true;
+            }
+          }
+          return false;
+        });
+        const connects=!!entry&&sampleRoute(plot,corridor)&&!collisionOnPath;
+        const score=(connects?1000:0)+stalls.length*20-(horizontal?0:1);
+        candidates.push({score,aisle:a,stalls,driveway:corridor,connectionPlausible:connects,aisleClearWidth:aisleWidth});
       }
-      if(!stalls.length)continue;
-      const target=center(a);
-      // Preliminary direct centerline: ensure the access point can connect to the aisle INSIDE THE SITE.
-      const entry=gate||null;
-      const corridor=entry?[entry,target]:[];
-      const connects=!!entry&&sampleRoute(plot,corridor)&&
-        !cores.some(c=>{const box=bounds(c);return corridor.some(p=>p[0]>box.minX&&p[0]<box.maxX&&p[1]>box.minY&&p[1]<box.maxY)});
-      // Mark stalls as counted only when the aisle itself is viable and there is a conceptual connection.
-      const score=(connects?1000:0)+stalls.length*20-(horizontal?0:1);
-      candidates.push({score,aisle:a,stalls,driveway:corridor,connectionPlausible:connects,aisleClearWidth:aisleWidth});
     }
   }
   candidates.sort((a,b)=>b.score-a.score);
