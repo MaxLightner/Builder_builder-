@@ -194,16 +194,16 @@ export function buildRoughStructure(site,design){
     warnings
   };
 }
-export function structureSVG(s,design,selectedFloor='all'){
+export function structureSVG(s,design,selectedFloor='all',layers={}){
   if(!s)return '';
   const points=p=>p?.map(v=>v[0]+','+(-v[1])).join(' ')||'';
   const polygon=(p,fill,stroke,width=.12,opacity=1)=>p?.length>2?'<polygon points="'+points(p)+'" fill="'+fill+'" fill-opacity="'+opacity+'" stroke="'+stroke+'" stroke-width="'+width+'"/>':'';
   const txt=(p,t,size=1)=>'<text x="'+p[0]+'" y="'+(-p[1])+'" font-size="'+size+'" text-anchor="middle" fill="#172f3c" style="paint-order:stroke;stroke:#ffffff;stroke-width:.22">'+t+'</text>';
   let html='<g class="rough-structure">';
-  html+=polygon(design.footprint,'#d9e5e8','#476574',.28,.52);
+  if(layers.slabs!==false)html+=polygon(design.footprint,'#d9e5e8','#476574',.28,.52);
   const line=design.assumptions.buildingLine;
   if(line)html+='<polyline points="'+points([line.start,line.end])+'" fill="none" stroke="#b23856" stroke-width=".5"/>';
-  if(selectedFloor==='all'||selectedFloor==='0'){
+  if(layers.parking!==false&&(selectedFloor==='all'||selectedFloor==='0')){
     if(s.parking.aisle.length)html+=polygon(s.parking.aisle,'#dbe0e6','#96a4b1',.08,.9);
     for(const stall of s.parking.stalls){
       html+=polygon(stall.polygon,'#d5ecdd','#378b62',.1,.94);
@@ -212,12 +212,12 @@ export function structureSVG(s,design,selectedFloor='all'){
     for(const stall of s.parking.uncountedCandidates)html+=polygon(stall.polygon,'#eee9df','#be9775',.08,.6);
     if(s.parking.driveway.length)html+='<polyline points="'+points(s.parking.driveway)+'" stroke="#db8d3a" stroke-width=".26" stroke-dasharray=".55 .45" fill="none"/>';
   }
-  for(const beam of s.beams)html+='<polyline points="'+points([beam.from,beam.to])+'" stroke="#607b88" stroke-width=".18" opacity=".6"/>';
-  for(const c of s.columns)html+=polygon(c.polygon,'#314b59','#203b48',.1,1);
-  const boxes=s.core.components;
+  if(layers.columns!==false){for(const beam of s.beams)html+='<polyline points="'+points([beam.from,beam.to])+'" stroke="#607b88" stroke-width=".18" opacity=".6"/>';
+  for(const c of s.columns)html+=polygon(c.polygon,'#314b59','#203b48',.1,1);}
+  if(layers.cores!==false){const boxes=s.core.components;
   html+=polygon(boxes.stair,'#a3b6d7','#3b6088',.23,.8)+polygon(boxes.elevator,'#7995c3','#254a7c',.23,.9)+polygon(boxes.landing,'#d2deed','#7189a6',.16,.84)+polygon(boxes.shaft,'#bd9eca','#885795',.2,.88);
   if(boxes.stair.length)html+=txt(center(boxes.stair),'STAIR',.85);
   if(boxes.elevator.length)html+=txt(center(boxes.elevator),'LIFT',.8);
-  if(boxes.shaft.length)html+=txt(center(boxes.shaft),'S',.65);
+  if(boxes.shaft.length)html+=txt(center(boxes.shaft),'S',.65);}
   return html+'</g>';
 }
