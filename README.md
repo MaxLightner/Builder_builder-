@@ -42,3 +42,10 @@ Neighbor volumes use a fixed 8 m illustrative depth; open-space strips use 10 m 
 ## Files
 
 `geometry.js`: polygon validation, areas, frames and context strips. `viewer.js`: SVG and 3D views. `app.js`: state, UI, storage and form. The viewer is independent of any future design engine. The application uses no paid service, account, AI endpoint or analytics.
+
+## Stage 1 occupancy assumption (research only)
+
+- Default site coverage is **65% of measured plot polygon area**, applied by geometric clipping to each of the three exploratory siting strategies. No setback rule is applied in this prototype.
+- A per-site opt-in toggle labelled **پیشروی / ساخت مازاد** allows an additional 0–35 **percentage points** above 65%. The default on activation is +10 percentage points, i.e. 75% site coverage. This is not a claim of legal entitlement, fine payment eligibility, or approval; real municipal rules must be verified separately.
+- Baseline and optional excess area, actual coverage, site area, and geometries are included in exported Design JSON. Site-specific toggle settings are stored only in browser localStorage.
+- All parking, core, vehicle circulation and structural shapes remain **illustrative placeholders**; current area compliance checks do not make the candidate a valid building or parking plan.
