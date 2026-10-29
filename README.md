@@ -1,4 +1,4 @@
-# Building Lab — Stage 0
+# Building Lab — Stage 0 + Stage 1
 
 محیط آزمایشی مرحله‌ای طراحی ساختمان، بدون API هوش مصنوعی و بدون Solver. رابط فارسی و راست‌به‌چپ، پنج سناریوی واقع‌نما، پلان SVG و مدل WebGL با Three.js و OrbitControls.
 
@@ -27,7 +27,7 @@ For GitHub Pages, select **Deploy from a branch → main → /(root)** under rep
 - Rectangle generator and arbitrary simple polygon form. Concave and clockwise polygons are supported; intersections, zero-length edges and invalid values are rejected.
 - New sites/edited copies persist in localStorage on this browser. Presets remain available. JSON downloads provide an independent copy. There is no server sync.
 - Keyboard-accessible controls, responsive UI, on-demand rendering and a 2D fallback if WebGL is unavailable. 3D keyboard: arrows pan, +/- zoom; mouse/touch OrbitControls.
-- Stages 1–3 are visible and disabled. No generated building mass, parking solver, compliance checks or room layouts are claimed.
+- Stage 1 is now selectable for all five presets and custom site polygons. It shows three deterministic, experimental massing options per site, 2D overlay and translucent 3D extrusions, including nominal yard, parking-zone and vertical-core placeholders, pedestrian/vehicle guide lines, approximate areas, and JSON design export. This is **not** a feasibility solver, parking maneuver checker, zoning-compliance check, approved architectural plan, or room layout. Stages 2–3 remain disabled.
 
 ## Coordinates and future data contract
 
@@ -35,7 +35,7 @@ For GitHub Pages, select **Deploy from a branch → main → /(root)** under rep
 
 Each edge contains `type: street|neighbor|open`, `height` (m), `streetWidth` (m), `view: good|medium|poor`, `privacy: low|medium|high`, and `access: none|pedestrian|vehicle|both`. Neighbor access is disallowed. Access markers are indicative, positioned along their edge; driveway width, gates and maneuvering are future work.
 
-`target` describes intended floors and units, not a permission or a generated result. `design: null` is reserved for a future Design JSON. A future GLB exporter can export the scene through Three.js GLTFExporter using the documented coordinate mapping and metric units. GLB export is not implemented in this version.
+`target` describes intended floors and units, not a permission or a generated result. Stage 0 exports `design: null`; Stage 1 exports a `design` object using `stage1.js`, including footprint, yard, core, parking, preliminary access guides and an explicit warnings list. A future GLB exporter can export the scene through Three.js GLTFExporter using the documented coordinate mapping and metric units. GLB export is not implemented in this version.
 
 Neighbor volumes use a fixed 8 m illustrative depth; open-space strips use 10 m depth. Adjacent strips may overlap at external corners; the model is a contextual diagram rather than a cadastral neighborhood reconstruction. Names and contexts are synthetic, with no location, legal setback or municipal code implied. View/privacy inputs are qualitative, not simulated evaluations.
 
