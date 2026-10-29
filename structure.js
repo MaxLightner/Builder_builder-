@@ -60,8 +60,8 @@ function placeCore(footprint,index){
       if(!within(footprint,envelope))continue;
       const stair=polyRect(x,y,2.65*scale,4.75*scale);
       const elevator=polyRect(x+2.85*scale,y+2.65*scale,1.92*scale,2.05*scale);
-      const landing=polyRect(x+2.85*scale,y+.18*scale,1.92*scale,2.25*scale);
-      const shaft=polyRect(x+2.87*scale,y+4.78*scale,.9*scale,.28*scale);
+      const landing=polyRect(x+2.85*scale,y+1.32*scale,1.92*scale,1.30*scale);
+      const shaft=polyRect(x+3.87*scale,y+.12*scale,.9*scale,1.1*scale);
       const components={stair,elevator,landing,shaft};
       if(Object.values(components).every(p=>within(footprint,p)))
         return {valid:true,name:configurations[index].name,envelope,components,stairwell:{width:R(2.65*scale),length:R(4.75*scale)},elevator:{width:R(1.92*scale),depth:R(2.05*scale)}};
