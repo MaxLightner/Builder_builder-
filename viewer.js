@@ -1,4 +1,4 @@
-import {renderRoughStructure} from './struct3d.js?v=1';
+import {renderRoughStructure} from './struct3d.js?v=2';
 import {bounds,edgeFrame,strip,length} from './geometry.js';
 export const colors={site:'#78b8ca',neighbor:'#abb8c2',street:'#cbd5db',open:'#9fbca8'};
 export const typeNames={neighbor:'همسایه',street:'خیابان',open:'فضای باز'};
