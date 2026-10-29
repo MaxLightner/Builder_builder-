@@ -27,6 +27,12 @@ const overlaps=(a,b,pad=0)=>{
   return x.minX<y.maxX+pad&&x.maxX>y.minX-pad&&x.minY<y.maxY+pad&&x.maxY>y.minY-pad;
 };
 function center(p){return p.reduce((s,v)=>[s[0]+v[0]/p.length,s[1]+v[1]/p.length],[0,0]);}
+function entrance(site,type){
+  const i=site.edges.findIndex(e=>e.type==='street'&&(e.access===type||e.access==='both'));
+  if(i<0)return null;
+  const p=site.polygon,t=type==='vehicle'?.36:.64,a=p[i],b=p[(i+1)%p.length];
+  return [a[0]*(1-t)+b[0]*t,a[1]*(1-t)+b[1]*t];
+}
 function sampleRoute(poly,route){
   if(route.length<2)return false;
   for(let i=1;i<route.length;i++){
