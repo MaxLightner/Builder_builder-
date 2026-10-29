@@ -57,7 +57,7 @@ function renderStage(){
   $('.workspace-foot span:last-child').textContent=stage===1?'استقرار مقید به رج شروع بنا؛ داده آزمایشی تا زمان ورود دستور نقشه. ۶۵٪ فرضی؛ سفت‌کاری هنوز طراحی نشده است.':'فقط شناخت زمین؛ طراحی ساختمان هنوز آغاز نشده است.';
   $('#export').textContent=stage===1?'دریافت Design JSON':'دریافت Site JSON';
   const status=$('#site-facts div:last-child dd');if(status)status.textContent=stage===1?'استقرار حجمی / مرحله یک':'شناخت بستر / مرحله صفر';
-  $('.scene-caption').innerHTML=stage===1?'<span style="background:#d6a371"></span> حجم <span style="background:#456779"></span> هسته <span style="background:#987bc3"></span> پارکینگ <span style="background:#86c09b"></span> حیاط / فضای باز':'<span class="site-dot"></span> زمین <span class="neighbor-dot"></span> همسایه <span class="street-dot"></span> گذر <span class="open-dot"></span> فضای باز';
+  $('.scene-caption').innerHTML=stage===1?'<span style="background:#d6a371"></span> حجم <span style="background:#bb2c4c"></span> رج شروع بنا <span style="background:#456779"></span> هسته اولیه <span style="background:#987bc3"></span> پارکینگ آزمایشی':'<span class="site-dot"></span> زمین <span class="neighbor-dot"></span> همسایه <span class="street-dot"></span> گذر <span class="open-dot"></span> فضای باز';
   if(stage===1&&!d){panel.innerHTML='<p class="stage-error">با این رج شروع بنا، حجم قابل ترسیم تولید نشد. فاصله رج را کاهش بدهید یا ضلع را تغییر دهید.</p><button id="reset-line" type="button">بازنشانی رج آزمایشی</button>';panel.querySelector('#reset-line').onclick=()=>changeBuildingLine(proposedLine(active).edgeIndex,0,false)}
   if(stage===1&&d){
     const c=coverageSettings(),line=c.buildingLine||proposedLine(active);
