@@ -44,6 +44,7 @@ function renderStage(){
   $('.live').textContent='Stage '+stage;
   $('.workspace-foot span:last-child').textContent=stage===1?'مدل پژوهشی؛ ظرفیت پارک، سطح اشغال و ضوابط هنوز اعتبارسنجی نشده‌اند.':'فقط شناخت زمین؛ طراحی ساختمان هنوز آغاز نشده است.';
   $('#export').textContent=stage===1?'دریافت Design JSON':'دریافت Site JSON';
+  const status=$('#site-facts div:last-child dd');if(status)status.textContent=stage===1?'استقرار حجمی / مرحله یک':'شناخت بستر / مرحله صفر';
   $('.scene-caption').innerHTML=stage===1?'<span style="background:#d6a371"></span> حجم <span style="background:#456779"></span> هسته <span style="background:#987bc3"></span> پارکینگ <span style="background:#86c09b"></span> حیاط / فضای باز':'<span class="site-dot"></span> زمین <span class="neighbor-dot"></span> همسایه <span class="street-dot"></span> گذر <span class="open-dot"></span> فضای باز';
   if(stage===1&&d){
     panel.innerHTML='<div class="stage-one-head"><strong>سه استراتژی اولیه استقرار</strong><span>سناریو '+esc(active.id)+' · بدون Solver</span></div><div class="stage-options">'+variants.map((v,i)=>'<button data-option="'+i+'" aria-pressed="'+(designChoice===i)+'" class="'+(designChoice===i?'chosen':'')+'"><b>گزینه '+v.id+'</b><small>'+v.name+'</small></button>').join('')+'</div><p class="strategy-note">'+d.note+'</p><div class="stage-warnings">'+d.warnings.map(w=>'<span>'+esc(w)+'</span>').join('')+'</div>';
