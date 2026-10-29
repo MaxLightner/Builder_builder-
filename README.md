@@ -11,6 +11,8 @@ python -m http.server 8080
 node --test tests/geometry.test.js
 ```
 
+Optional browser regression checks use an existing Playwright installation (`PLAYWRIGHT_MODULE` can point to its module path) and existing Chrome (`CHROME_PATH` can override its executable). Run `node tests/browser.cjs <base-url>`; no browser download is needed.
+
 For GitHub Pages, select **Deploy from a branch → main → /(root)** under repository Settings → Pages. All paths are relative and support project Pages subpaths.
 
 ## What is implemented
