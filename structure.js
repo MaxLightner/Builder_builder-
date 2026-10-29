@@ -128,7 +128,7 @@ function parkingCandidates(footprint,core,columns,plot,gate){
 }
 function addColumns(footprint,core,phase=0){
   const b=bounds(footprint),W=b.maxX-b.minX,H=b.maxY-b.minY;
-  const countX=Math.max(1,Math.ceil((W-.65)/6.5)),countY=Math.max(1,Math.ceil((H-.65)/6.5));
+  const countX=Math.max(1,Math.ceil((W-.65)/6.5)),countY=Math.max(1,Math.ceil((H-.65)/8));
   const stepX=(W-.65)/countX,stepY=(H-.65)/countY;
   const out=[],rejected=[],section=.38,collision=[core.envelope].filter(p=>p?.length);
   for(let j=0;j<=countY;j++)for(let i=0;i<=countX;i++){
@@ -173,7 +173,7 @@ export function buildRoughStructure(site,design){
     !core.valid?'هسته پله/آسانسور در سطح فعلی جا نگرفت؛ این گزینه قابل تأیید نیست.':'ابعاد و تعداد پله، آسانسور، خروج اضطراری و ضوابط آتش هنوز کنترل نشده‌اند.',
     !parking.connectionPlausible?'اتصال مستقیم قابل قبول از خیابان به راهروی پارکینگ پیدا نشد؛ ظرفیت تأییدنشده است.':'',
     !counted.length?'در این گزینه جای پارک قابل شمارش با بررسی هندسی اولیه ثبت نشد.':'',
-    structural.grid.intervalX>6.5||structural.grid.intervalY>6.5?'برخی دهانه‌ها از بازه معمول آزمایشی بزرگ‌ترند.':''
+    structural.grid.intervalX>7||structural.grid.intervalY>7?'برخی دهانه‌ها از بازه معمول آزمایشی بزرگ‌ترند.':''
   ].filter(Boolean);
   return {
     schemaVersion:'2.0',units:'m',coordinateSystem:'x,y plot; z elevation',
