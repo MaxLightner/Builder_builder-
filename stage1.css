@@ -11,3 +11,12 @@
 .design-overlay{pointer-events:none}
 .stages button:nth-child(2){opacity:1}
 @media(max-width:700px){.stage-one-panel{padding:12px}.stage-options{gap:5px}.stage-options button{padding:9px 7px;min-height:67px}.stage-options b{font-size:12px}.stage-options small{font-size:10px}.stage-warnings span{font-size:10px}}
+
+.coverage-controls{display:flex;align-items:center;gap:10px 15px;flex-wrap:wrap;padding:10px 12px;margin-bottom:12px;background:#f4f7f8;border:1px solid #dee8eb;border-radius:7px;font-size:12px}
+.coverage-base{display:flex;align-items:center;gap:10px}.coverage-base strong{font:600 18px "Segoe UI",sans-serif;color:#225d74}
+.coverage-switch{display:flex;align-items:center;gap:7px;cursor:pointer;color:#284857}
+.coverage-switch input{accent-color:#a95b35;width:18px;height:18px}
+.coverage-extra{display:flex;gap:8px;align-items:center;white-space:nowrap}
+.coverage-extra input{width:66px;min-height:34px;padding:5px 8px;direction:ltr;text-align:center}
+.coverage-total{font-size:11px;color:#3d6271}.coverage-total b{font-size:13px;color:#204956}.coverage-total em{font-style:normal;color:#a04726;font-weight:600}
+@media(max-width:700px){.coverage-controls{padding:9px;gap:7px 10px}.coverage-total{flex-basis:100%}.coverage-extra{font-size:11px}}
