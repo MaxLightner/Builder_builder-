@@ -63,9 +63,10 @@ function placeCore(footprint,index){
   }
   return {valid:false,name:'هسته جانمایی نشده',envelope:[],components:{stair:[],elevator:[],landing:[],shaft:[]}};
 }
-function parkingCandidates(footprint,core,plot,gate){
+function parkingCandidates(footprint,core,columns,plot,gate){
   const b=bounds(footprint),w=b.maxX-b.minX,h=b.maxY-b.minY;
   const cores=[core.envelope].filter(p=>p.length);
+  const physicalObstacles=[...cores,...columns.map(c=>c.polygon)];
   const candidates=[];
   for(const horizontal of [true,false]){
     const axisLength=horizontal?w:h,depth=horizontal?h:w;
@@ -77,7 +78,7 @@ function parkingCandidates(footprint,core,plot,gate){
       const a=horizontal?
         polyRect(b.minX+.2,b.minY+offset,w-.4,aisleWidth):
         polyRect(b.minX+offset,b.minY+.2,aisleWidth,h-.4);
-      if(!within(footprint,a)||cores.some(c=>overlaps(a,c,.03)))continue;
+      if(!within(footprint,a)||physicalObstacles.some(c=>overlaps(a,c,.03)))continue;
       const stalls=[];
       for(const side of [-1,1]){
         const row=horizontal?
@@ -87,7 +88,7 @@ function parkingCandidates(footprint,core,plot,gate){
         for(let i=0;i<count;i++){
           const axis=horizontal?b.minX+.22+i*stallWidth:b.minY+.22+i*stallWidth;
           const p=horizontal?polyRect(axis,row,stallWidth,stallDepth):polyRect(row,axis,stallDepth,stallWidth);
-          if(!within(footprint,p)||cores.some(c=>overlaps(p,c,.08))||stalls.some(c=>overlaps(p,c.polygon,.02)))continue;
+          if(!within(footprint,p)||physicalObstacles.some(c=>overlaps(p,c,.08))||stalls.some(c=>overlaps(p,c.polygon,.02)))continue;
           stalls.push({id:'P'+(stalls.length+1),polygon:p,kind:'perpendicular-90',dimensions:[2.5,5],independent:true,orientation:horizontal?'N-S':'E-W'});
         }
       }
@@ -106,11 +107,11 @@ function parkingCandidates(footprint,core,plot,gate){
   candidates.sort((a,b)=>b.score-a.score);
   return candidates[0]||{score:0,aisle:[],stalls:[],driveway:[],connectionPlausible:false,aisleClearWidth:0};
 }
-function addColumns(footprint,core,parking){
+function addColumns(footprint,core,phase=0){
   const b=bounds(footprint),W=b.maxX-b.minX,H=b.maxY-b.minY;
-  const countX=Math.max(1,Math.ceil((W-.65)/5.5)),countY=Math.max(1,Math.ceil((H-.65)/5.5));
+  const countX=Math.max(1,Math.ceil((W-.65)/6.5)),countY=Math.max(1,Math.ceil((H-.65)/6.5));
   const stepX=(W-.65)/countX,stepY=(H-.65)/countY;
-  const out=[],rejected=[],section=.38,collision=[...parking.stalls.map(s=>s.polygon),parking.aisle,core.components.stair,core.components.elevator,core.components.shaft].filter(p=>p?.length);
+  const out=[],rejected=[],section=.38,collision=[core.envelope].filter(p=>p?.length);
   for(let j=0;j<=countY;j++)for(let i=0;i<=countX;i++){
     const x=b.minX+.325+i*stepX,y=b.minY+.325+j*stepY;
     const p=polyRect(x-section/2,y-section/2,section,section);
@@ -136,8 +137,9 @@ function beams(columns,footprint){
 export function buildRoughStructure(site,design){
   const footprint=design.footprint,levels=site.target.floors,levelHeight=3.2;
   const core=placeCore(footprint,'ABC'.indexOf(design.id));
-  const parking=parkingCandidates(footprint,core,site.polygon,design.vehicleEntrance);
-  const structural=addColumns(footprint,core,parking);
+  const structural=addColumns(footprint,core);
+  // The load-path column grid is established BEFORE parking. Never delete columns to increase parking count.
+  const parking=parkingCandidates(footprint,core,structural.columns,site.polygon,design.vehicleEntrance);
   const slabCount=levels+2;// ground (parking) + N typical floors + roof.
   const slabs=Array.from({length:slabCount},(_,i)=>({
     id:i===0?'GROUND':i===slabCount-1?'ROOF':'F'+i,
@@ -148,11 +150,11 @@ export function buildRoughStructure(site,design){
   const warnings=[
     'این مدل، پیش‌طرح هندسی سفت‌کاری است؛ طراحی سازه و کنترل مقررات ندارد.',
     'اتصال مسیر خودرو و عرض راهرو فقط هندسی است؛ شعاع گردش و مسیر حرکت خودرو شبیه‌سازی نشده است.',
-    'ستون‌هایی که با محدوده پارک یا هسته تداخل داشتند حذف شده‌اند؛ دهانه‌های جدید باید مهندسی شوند.',
+    'ستون‌گذاری اولیه مستقل از پارکینگ تولید شده است؛ نقاط حذف‌شده در هسته نیاز به بازطراحی سازه دارند.',
     !core.valid?'هسته پله/آسانسور در سطح فعلی جا نگرفت؛ این گزینه قابل تأیید نیست.':'ابعاد و تعداد پله، آسانسور، خروج اضطراری و ضوابط آتش هنوز کنترل نشده‌اند.',
     !parking.connectionPlausible?'اتصال مستقیم قابل قبول از خیابان به راهروی پارکینگ پیدا نشد؛ ظرفیت تأییدنشده است.':'',
     !counted.length?'در این گزینه جای پارک قابل شمارش با بررسی هندسی اولیه ثبت نشد.':'',
-    structural.grid.intervalX>6||structural.grid.intervalY>6?'برخی دهانه‌ها از بازه معمول آزمایشی بزرگ‌ترند.':''
+    structural.grid.intervalX>6.5||structural.grid.intervalY>6.5?'برخی دهانه‌ها از بازه معمول آزمایشی بزرگ‌ترند.':''
   ].filter(Boolean);
   return {
     schemaVersion:'2.0',units:'m',coordinateSystem:'x,y plot; z elevation',
