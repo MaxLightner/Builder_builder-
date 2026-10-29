@@ -20,3 +20,10 @@
 .coverage-extra input{width:66px;min-height:34px;padding:5px 8px;direction:ltr;text-align:center}
 .coverage-total{font-size:11px;color:#3d6271}.coverage-total b{font-size:13px;color:#204956}.coverage-total em{font-style:normal;color:#a04726;font-weight:600}
 @media(max-width:700px){.coverage-controls{padding:9px;gap:7px 10px}.coverage-total{flex-basis:100%}.coverage-extra{font-size:11px}}
+
+.municipal-line{display:flex;align-items:center;gap:9px 13px;flex-wrap:wrap;padding:12px;background:#f1f3f7;border:1px solid #c4d1db;border-right:3px solid #bb2c4c;border-radius:7px;margin-bottom:10px}
+.municipal-line>strong{flex-basis:100%;font-size:13px;color:#394957}.municipal-line label{display:flex;align-items:center;gap:7px;white-space:normal;font-size:11px}
+.municipal-line select{max-width:185px;min-height:36px;padding:4px 6px}.municipal-line input[type=number]{width:72px;min-height:36px;padding:4px 6px;direction:ltr}
+.municipal-line .line-verified{gap:5px;cursor:pointer}.municipal-line input[type=checkbox]{accent-color:#bb2c4c;width:17px;height:17px}
+.municipal-line>small{flex-basis:100%;font-size:11px;color:#9b4a34;line-height:1.6}
+.stage-error{padding:12px;color:#9b4a34;font-size:12px;line-height:1.8}
