@@ -1,6 +1,6 @@
 import {area,length,bounds,validatePolygon,validateSite} from './geometry.js';
-import {planSVG,createViewer,colors,typeNames} from './viewer.js';
-import {stageOneOptions,stageOneSVG} from './stage1.js';
+import {planSVG,createViewer,colors,typeNames} from './viewer.js?v=5';
+import {stageOneOptions,stageOneSVG} from './stage1.js?v=5';
 const $=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fa=n=>new Intl.NumberFormat('fa-IR',{maximumFractionDigits:1}).format(n),quality={good:'خوب',medium:'متوسط',poor:'محدود'},privacy={low:'کم',medium:'متوسط',high:'زیاد'},accessNames={none:'بدون دسترسی',pedestrian:'پیاده',vehicle:'سواره',both:'سواره و پیاده'};
 const storageKey='building-lab.sites.v1';let sites=[],custom=[],active,selected=0,view='3d',viewer=null,draftEdges=[],editing=null,formPolygon;
