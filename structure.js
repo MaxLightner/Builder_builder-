@@ -73,7 +73,7 @@ function parkingCandidates(footprint,core,columns,plot,gate){
     if(axisLength<5.2||depth<10.4)continue;
     const aisleWidth=5.5,stallDepth=5,stallWidth=2.5;
     // Aisle can be close to either end or in the middle. Every counted stall is fully inside ground footprint.
-    const offsets=[.3,Math.max(.3,depth-aisleWidth-stallDepth-.3),Math.max(.3,(depth-aisleWidth)/2)];
+    const offsets=[.55,.65,.85,1.1,Math.max(.55,depth-aisleWidth-stallDepth-.25),Math.max(.55,(depth-aisleWidth)/2)];
     for(const offset of offsets){
       const a=horizontal?
         polyRect(b.minX+.2,b.minY+offset,w-.4,aisleWidth):
