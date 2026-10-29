@@ -1,0 +1,1 @@
+{"name":"building-lab","version":"0.1.0","private":true,"type":"module","description":"Stage 0 generative building layout research prototype","scripts":{"test":"node --test tests/geometry.test.js"},"engines":{"node":">=20"}}

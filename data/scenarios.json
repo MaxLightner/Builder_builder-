@@ -1,0 +1,345 @@
+[
+  {
+    "id": "A",
+    "name": "حیاط جنوبی",
+    "subtitle": "قطعه منظم و کم‌عرض",
+    "description": "بافت مسکونی آرام؛ گذر در جنوب و سه همسایه با ارتفاع متفاوت.",
+    "schemaVersion": "1.0",
+    "units": "m",
+    "polygon": [
+      [
+        0,
+        0
+      ],
+      [
+        10,
+        0
+      ],
+      [
+        10,
+        20
+      ],
+      [
+        0,
+        20
+      ]
+    ],
+    "north": 0,
+    "target": {
+      "floors": 3,
+      "unitsPerFloor": 1
+    },
+    "edges": [
+      {
+        "type": "street",
+        "streetWidth": 10,
+        "height": 0,
+        "view": "medium",
+        "privacy": "low",
+        "access": "both"
+      },
+      {
+        "type": "neighbor",
+        "height": 12,
+        "view": "poor",
+        "privacy": "high",
+        "access": "none",
+        "streetWidth": 0
+      },
+      {
+        "type": "neighbor",
+        "height": 9,
+        "view": "poor",
+        "privacy": "high",
+        "access": "none",
+        "streetWidth": 0
+      },
+      {
+        "type": "neighbor",
+        "height": 6,
+        "view": "medium",
+        "privacy": "medium",
+        "access": "none",
+        "streetWidth": 0
+      }
+    ],
+    "design": null
+  },
+  {
+    "id": "B",
+    "name": "میان‌افزای شهری",
+    "subtitle": "دو واحد در هر طبقه",
+    "description": "گذر محلی ۱۲ متری در جنوب؛ همسایه‌های بلندتر در بافت متراکم.",
+    "schemaVersion": "1.0",
+    "units": "m",
+    "polygon": [
+      [
+        0,
+        0
+      ],
+      [
+        12,
+        0
+      ],
+      [
+        12,
+        25
+      ],
+      [
+        0,
+        25
+      ]
+    ],
+    "north": 12,
+    "target": {
+      "floors": 5,
+      "unitsPerFloor": 2
+    },
+    "edges": [
+      {
+        "type": "street",
+        "streetWidth": 12,
+        "height": 0,
+        "view": "medium",
+        "privacy": "low",
+        "access": "both"
+      },
+      {
+        "type": "neighbor",
+        "height": 18,
+        "view": "poor",
+        "privacy": "high",
+        "access": "none",
+        "streetWidth": 0
+      },
+      {
+        "type": "neighbor",
+        "height": 15,
+        "view": "poor",
+        "privacy": "high",
+        "access": "none",
+        "streetWidth": 0
+      },
+      {
+        "type": "neighbor",
+        "height": 12,
+        "view": "poor",
+        "privacy": "high",
+        "access": "none",
+        "streetWidth": 0
+      }
+    ],
+    "design": null
+  },
+  {
+    "id": "C",
+    "name": "خانه در نبش",
+    "subtitle": "دو خیابان، دو جبهه باز",
+    "description": "نبش یک گذر محلی و خیابان اصلی؛ ورودی سواره از گذر کم‌عرض‌تر.",
+    "schemaVersion": "1.0",
+    "units": "m",
+    "polygon": [
+      [
+        0,
+        0
+      ],
+      [
+        16,
+        0
+      ],
+      [
+        16,
+        20
+      ],
+      [
+        0,
+        20
+      ]
+    ],
+    "north": 25,
+    "target": {
+      "floors": 4,
+      "unitsPerFloor": 2
+    },
+    "edges": [
+      {
+        "type": "street",
+        "streetWidth": 16,
+        "height": 0,
+        "view": "good",
+        "privacy": "low",
+        "access": "pedestrian"
+      },
+      {
+        "type": "street",
+        "streetWidth": 8,
+        "height": 0,
+        "view": "medium",
+        "privacy": "low",
+        "access": "vehicle"
+      },
+      {
+        "type": "neighbor",
+        "height": 12,
+        "view": "poor",
+        "privacy": "high",
+        "access": "none",
+        "streetWidth": 0
+      },
+      {
+        "type": "neighbor",
+        "height": 9,
+        "view": "poor",
+        "privacy": "high",
+        "access": "none",
+        "streetWidth": 0
+      }
+    ],
+    "design": null
+  },
+  {
+    "id": "D",
+    "name": "قطعه قناص",
+    "subtitle": "پنج ضلع، یک چالش هندسی",
+    "description": "قطعه پنج‌ضلعی در امتداد گذر؛ شکست شمال‌شرق رو به باغ همسایه.",
+    "schemaVersion": "1.0",
+    "units": "m",
+    "polygon": [
+      [
+        0,
+        0
+      ],
+      [
+        14,
+        0
+      ],
+      [
+        14,
+        14
+      ],
+      [
+        8,
+        19
+      ],
+      [
+        0,
+        19
+      ]
+    ],
+    "north": 345,
+    "target": {
+      "floors": 5,
+      "floorsMin": 4,
+      "unitsPerFloor": 1
+    },
+    "edges": [
+      {
+        "type": "street",
+        "streetWidth": 8,
+        "height": 0,
+        "view": "medium",
+        "privacy": "low",
+        "access": "both"
+      },
+      {
+        "type": "neighbor",
+        "height": 12,
+        "view": "poor",
+        "privacy": "high",
+        "access": "none",
+        "streetWidth": 0
+      },
+      {
+        "type": "open",
+        "height": 0,
+        "view": "good",
+        "privacy": "medium",
+        "access": "none",
+        "streetWidth": 0
+      },
+      {
+        "type": "neighbor",
+        "height": 9,
+        "view": "poor",
+        "privacy": "high",
+        "access": "none",
+        "streetWidth": 0
+      },
+      {
+        "type": "neighbor",
+        "height": 6,
+        "view": "medium",
+        "privacy": "high",
+        "access": "none",
+        "streetWidth": 0
+      }
+    ],
+    "design": null
+  },
+  {
+    "id": "E",
+    "name": "رو به فضای سبز",
+    "subtitle": "قطعه بزرگ با ظرفیت چندواحدی",
+    "description": "زمین ۶۰۰ متری با خیابان جنوبی و فضای سبز عمومی در جبهه شرقی.",
+    "schemaVersion": "1.0",
+    "units": "m",
+    "polygon": [
+      [
+        0,
+        0
+      ],
+      [
+        20,
+        0
+      ],
+      [
+        20,
+        30
+      ],
+      [
+        0,
+        30
+      ]
+    ],
+    "north": 0,
+    "target": {
+      "floors": 6,
+      "unitsPerFloor": 3
+    },
+    "edges": [
+      {
+        "type": "street",
+        "streetWidth": 14,
+        "height": 0,
+        "view": "medium",
+        "privacy": "low",
+        "access": "both"
+      },
+      {
+        "type": "open",
+        "height": 0,
+        "view": "good",
+        "privacy": "medium",
+        "access": "none",
+        "streetWidth": 0
+      },
+      {
+        "type": "neighbor",
+        "height": 15,
+        "view": "poor",
+        "privacy": "high",
+        "access": "none",
+        "streetWidth": 0
+      },
+      {
+        "type": "neighbor",
+        "height": 18,
+        "view": "poor",
+        "privacy": "high",
+        "access": "none",
+        "streetWidth": 0
+      }
+    ],
+    "design": null
+  }
+]

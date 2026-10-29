@@ -1,0 +1,10 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import {area,validateSite,validatePolygon,strip} from '../geometry.js';
+const scenarios=JSON.parse(fs.readFileSync(new URL('../data/scenarios.json',import.meta.url)));
+test('five valid fixtures cover required areas and floor counts',()=>{assert.equal(scenarios.length,5);assert.deepEqual(scenarios.map(s=>area(s.polygon)),[200,300,320,251,600]);scenarios.forEach(validateSite);assert.deepEqual(scenarios.map(s=>s.target.floors),[3,5,4,5,6]);assert.equal(scenarios[2].edges.filter(e=>e.type==='street').length,2)});
+test('outward context strips follow either polygon winding',()=>{const p=[[0,0],[10,0],[10,20],[0,20]];assert.equal(strip(p,0,10)[3][1],-10);assert.equal(strip([...p].reverse(),2,10)[3][1],-10)});
+test('reject crossing, touching, degenerate, duplicate and nonfinite polygons',()=>{for(const p of [[[0,0],[10,10],[0,10],[10,0]],[[0,0],[10,0],[0,0]],[[0,0],[1,0],[2,0]],[[0,0],[10,0],[10,10],[5,0],[0,10]],[[0,0],[Infinity,0],[0,10]]])assert.throws(()=>validatePolygon(p))});
+test('accept concave polygons and clockwise polygons',()=>{validatePolygon([[0,0],[10,0],[10,10],[5,6],[0,10]]);validatePolygon([[0,0],[0,10],[10,10],[10,0]])});
+test('reject access through neighbor and invalid targets',()=>{const s=structuredClone(scenarios[0]);s.edges[1].access='vehicle';assert.throws(()=>validateSite(s));s.edges[1].access='none';s.target.floors=2.5;assert.throws(()=>validateSite(s))});
