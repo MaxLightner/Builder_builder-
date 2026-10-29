@@ -152,7 +152,7 @@ export function buildRoughStructure(site,design){
   const core=placeCore(footprint,'ABC'.indexOf(design.id));
   const structural=addColumns(footprint,core);
   // The load-path column grid is established BEFORE parking. Never delete columns to increase parking count.
-  const parking=parkingCandidates(footprint,core,structural.columns,site.polygon,design.vehicleEntrance);
+  const parking=parkingCandidates(footprint,core,structural.columns,site.polygon,entrance(site,'vehicle'));
   const slabCount=levels+2;// ground (parking) + N typical floors + roof.
   const slabs=Array.from({length:slabCount},(_,i)=>({
     id:i===0?'GROUND':i===slabCount-1?'ROOF':'F'+i,
