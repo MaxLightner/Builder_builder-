@@ -102,7 +102,7 @@ function createOption(site,index,config){
   const footprint=target>1e-8?cutToArea(usable,line.inward,target):[];
   if(!footprint.length)return null;
   const baseline=Math.min(plotArea*.65,area(behindLine));
-  const baseFootprint=cutToArea(behindLine,line.inward,baseline);
+  const baseFootprint=cutToArea(usable,line.inward,Math.min(baseline,area(usable)));
   const b=bounds(footprint),w=b.maxX-b.minX,h=b.maxY-b.minY;
   const core=rectIn(footprint,Math.max(2.5,Math.min(3.7,w*.23)),Math.max(3,Math.min(4.6,h*.25)),index===2?'NE':'NW');
   const parking=rectIn(footprint,Math.max(4.6,Math.min(7.3,w*.54)),Math.max(4.5,Math.min(5.5,h*.27)),index===1?'SW':'SE',core);
