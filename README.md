@@ -8,7 +8,7 @@ Serve this directory using any static HTTP server (opening `index.html` through 
 
 ```sh
 python -m http.server 8080
-node --test tests/geometry.test.js
+npm test
 ```
 
 Optional browser regression checks use an existing Playwright installation (`PLAYWRIGHT_MODULE` can point to its module path) and existing Chrome (`CHROME_PATH` can override its executable). Run `node tests/browser.cjs <base-url>`; no browser download is needed.
