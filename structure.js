@@ -146,7 +146,7 @@ function beams(columns,footprint){
   for(let i=0;i<columns.length;i++)for(let j=i+1;j<columns.length;j++){
     const a=columns[i],b=columns[j],sameX=Math.abs(a.x-b.x)<.15,sameY=Math.abs(a.y-b.y)<.15;
     if(!sameX&&!sameY)continue;
-    if(Math.hypot(a.x-b.x,a.y-b.y)>7.5)continue;
+    if(Math.hypot(a.x-b.x,a.y-b.y)>9)continue;
     if(columns.some((c,k)=>k!==i&&k!==j&&(sameX?Math.abs(c.x-a.x)<.15&&c.y>Math.min(a.y,b.y)&&c.y<Math.max(a.y,b.y):Math.abs(c.y-a.y)<.15&&c.x>Math.min(a.x,b.x)&&c.x<Math.max(a.x,b.x))))continue;
     if(!sampleRoute(footprint,[[a.x,a.y],[b.x,b.y]]))continue;
     out.push({from:[a.x,a.y],to:[b.x,b.y],width:.26,depth:.42});
