@@ -17,7 +17,7 @@ test('all scenarios produce separately stacked slabs and vertical stair/lift box
   assert.equal(s.slabs.length,site.target.floors+2,site.id+option.id);
   assert.equal(s.slabs[0].kind,'parking-ground');
   assert.equal(s.slabs.at(-1).kind,'roof');
-  assert.equal(s.roofLevel,3.2*(site.target.floors+1));
+  assert.ok(Math.abs(s.roofLevel-3.2*(site.target.floors+1))<1e-9,'elevation must match within floating point tolerance');
   assert.ok(s.core.components.stair.length===4,site.id+option.id);
   assert.ok(s.core.components.elevator.length===4,site.id+option.id);
   assert.ok(s.shafts.length>0,site.id+option.id);
@@ -38,7 +38,8 @@ test('parking count matches physical stalls, with obstacles preserved',()=>{
      assert.ok(stall.polygon.every(x=>pointIn(option.footprint,x)));
      for(const col of s.columns)assert.equal(overlaps(stall.polygon,col.polygon,.04),false,site.id+option.id);
      assert.equal(overlaps(stall.polygon,s.core.envelope,.04),false);
-     assert.equal(overlaps(stall.polygon,p.aisle,.0001),false);
+     // A parking bay must TOUCH the aisle at its entry edge; contact is not overlap.
+     assert.equal(overlaps(stall.polygon,p.aisle,-.0001),false);
    }
    if(p.count)for(const col of s.columns)assert.equal(overlaps(p.aisle,col.polygon,.03),false,site.id+option.id);
  }
