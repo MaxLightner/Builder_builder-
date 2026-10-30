@@ -1,0 +1,218 @@
+import {area,bounds} from '../geometry.js';
+import {createProject,issuesFor,facadeAnalysis,updateItem,deleteItem,addItem,suggestLocalRepair,categories,frontageAllocation} from './engine.js';
+const $=id=>document.getElementById(id);
+const svg=$('plan');
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=n=>new Intl.NumberFormat('fa-IR',{maximumFractionDigits:2}).format(n);
+const colors={bedroom:'#a1c5df',living:'#b5d9cb',kitchen:'#f0d7a2',core:'#a7a3bb',corridor:'#dbe2e6',balcony:'#dbbfcb',shop:'#e0c0a7'};
+const label={error:'تعارض',warning:'هشدار',review:'بررسی‌نشده'};
+let fixtures=[],project=null,selectedId=null,undos=[],redos=[],drag=null,saveNote='ثبت‌شده';
+const copy=o=>structuredClone(o);
+function storeKey(id){return 'building-studio.v1.'+id;}
+function persist(){
+ try{localStorage.setItem(storeKey(project.site.id),JSON.stringify(project));saveNote='ذخیره در همین مرورگر';}
+ catch{saveNote='ذخیره مرورگر ناموفق؛ JSON دریافت کنید';}
+ $('status').textContent=saveNote;
+}
+function recover(site){
+ try{const raw=localStorage.getItem(storeKey(site.id));if(raw){const data=JSON.parse(raw);if(valid(data)&&data.site.id===site.id)return data;}}catch{}
+ return createProject(site);
+}
+function valid(p){
+ return p&&p.version===1&&p.site&&Array.isArray(p.site.polygon)&&Array.isArray(p.site.edges)&&Array.isArray(p.footprint)&&
+ p.footprint.length>=3&&Array.isArray(p.items)&&p.items.length<=80&&p.items.every(r=>r&&typeof r.id==='string'&&typeof r.type==='string'&&[r.x,r.y,r.w,r.h].every(Number.isFinite)&&r.w>0&&r.h>0)&&
+ p.parking&&p.commercial&&Array.isArray(p.supports)&&p.supports.length<100;
+}
+function useProject(p,select=null){
+ project=p;selectedId=select;undos=[];redos=[];persist();render();
+}
+function mutation(fn){
+ if(!project)return;
+ const old=copy(project);
+ const next=fn(copy(project));
+ if(!next||JSON.stringify(next)===JSON.stringify(project))return;
+ undos.push(old);if(undos.length>40)undos.shift();redos=[];
+ project=next;persist();render();
+}
+function refreshActions(){
+ $('undo').disabled=!undos.length;
+ $('redo').disabled=!redos.length;
+ $('repair').disabled=!selectedId||!project.items.some(r=>r.id===selectedId);
+}
+function chooseSite(id){
+ const site=fixtures.find(s=>s.id===id);if(!site)return;
+ useProject(recover(site));
+ $('site').value=id;
+}
+function svgPoly(poly){return poly.map(p=>p[0]+','+(-p[1])).join(' ');}
+function svgText(x,y,str,cls){return '<text class="'+cls+'" text-anchor="middle" x="'+x+'" y="'+(-y)+'">'+esc(str)+'</text>';}
+function issueIds(){return new Set(issuesFor(project).filter(i=>i.severity==='error').flatMap(i=>i.ids));}
+function renderPlan(){
+ const s=project.site,b=bounds(s.polygon),W=b.maxX-b.minX,H=b.maxY-b.minY,m=Math.max(W,H)*.12;
+ svg.setAttribute('viewBox',[(b.minX-m),-(b.maxY+m),W+2*m,H+2*m].join(' '));
+ let html='<rect x="'+(b.minX-m)+'" y="'+(-(b.maxY+m))+'" width="'+(W+2*m)+'" height="'+(H+2*m)+'" fill="#edf2f0"/>';
+ // Plot / footprint: use real polygon, not an invented rectangle.
+ html+='<polygon class="site-boundary" points="'+svgPoly(s.polygon)+'"/>';
+ html+='<polygon class="footprint" points="'+svgPoly(project.footprint)+'"/>';
+ for(let i=0;i<s.polygon.length;i++){
+   const e=s.edges[i],a=s.polygon[i],q=s.polygon[(i+1)%s.polygon.length];
+   html+='<line x1="'+a[0]+'" y="'+(-a[1])+'" x2="'+q[0]+'" y2="'+(-q[1])+'" stroke="'+(e.type==='street'?'#3c7596':e.type==='open'?'#57a77e':'#a37b7e')+'" stroke-width=".16" stroke-dasharray="'+(e.type==='neighbor'?'.25,.13':'none')+'"/>';
+ }
+ for(const f of facadeAnalysis(project)){
+   html+='<line class="facade-line fa-'+esc(f.kind)+'" x1="'+f.a[0]+'" y1="'+(-f.a[1])+'" x2="'+f.b[0]+'" y2="'+(-f.b[1])+'"/>';
+ }
+ const errors=issueIds();
+ for(const r of project.items){
+   const selected=r.id===selectedId,fill=colors[r.type]||'#c9d8e7',invalid=errors.has(r.id);
+   html+='<g data-room="'+esc(r.id)+'"><rect data-room="'+esc(r.id)+'" class="halo'+(selected?' selected':'')+(invalid?' invalid':'')+'" x="'+r.x+'" y="'+(-(r.y+r.h))+'" width="'+r.w+'" height="'+r.h+'" rx=".08" stroke="#718a9d" stroke-width=".055" fill="'+fill+'" fill-opacity=".88"/>';
+   const x=r.x+r.w/2,cy=r.y+r.h/2;
+   html+=svgText(x,cy+.12,r.label,'halo-label')+svgText(x,cy-.32,fmt(r.w*r.h)+' m²','halo-area');
+   if(selected)html+='<circle class="resize-handle" data-resize="'+esc(r.id)+'" cx="'+(r.x+r.w)+'" cy="'+(-(r.y+r.h))+'" r=".23"/>';
+   html+='</g>';
+ }
+ for(const support of project.supports||[]){
+   const faded=support.deleted;
+   html+='<g data-support="'+esc(support.id)+'"><rect x="'+(support.x-.18)+'" y="'+(-support.y-.18)+'" width=".36" height=".36" fill="'+(faded?'none':'#364e64')+'" stroke="'+(faded?'#dc4e50':'#182b39')+'" stroke-width=".1"/>';
+   if(faded)html+='<path d="M'+(support.x-.22)+' '+(-support.y-.22)+' L'+(support.x+.22)+' '+(-support.y+.22)+' M'+(support.x-.22)+' '+(-support.y+.22)+' L'+(support.x+.22)+' '+(-support.y-.22)+'" stroke="#dc4e50" stroke-width=".1"/>';
+   html+='</g>';
+ }
+ const en=project.entrance;if(en)html+='<circle cx="'+en.x+'" cy="'+(-en.y)+'" r=".16" fill="#0e7a6f"/>'+svgText(en.x,en.y-.6,'ورود','halo-area');
+ svg.innerHTML=html;
+}
+function renderInspector(){
+ const el=$('selection'),r=project.items.find(q=>q.id===selectedId);
+ if(!r){el.innerHTML='<p class="helper">یک هاله را انتخاب کنید. درگ = حرکت، دستگیره = تغییر ابعاد.</p>';return;}
+ el.innerHTML='<h3>'+esc(r.label)+'</h3><div class="edit-grid">'+
+  [['x','مختصات X'],['y','مختصات Y'],['w','عرض (متر)'],['h','طول (متر)']].map(([k,n])=>'<label><span>'+n+'</span><input type="number" data-edit="'+k+'" step=".1" min="'+(k==='w'||k==='h'?'.5':'-500')+'" value="'+r[k]+'"></label>').join('')+
+  '</div><div class="selection-actions"><button id="remove-selected">حذف هاله</button></div><p class="helper">هاله مرز دیوار نیست؛ صرفاً نیت فضایی و ابعاد تقریبی است.</p>';
+ el.querySelectorAll('[data-edit]').forEach(inp=>inp.onchange=()=>{
+   const k=inp.dataset.edit,n=+inp.value;
+   if(!Number.isFinite(n)||(k==='w'||k==='h')&&n<.5){renderInspector();return;}
+   mutation(p=>updateItem(p,selectedId,{[k]:Math.round(n*100)/100}));
+ });
+ $('remove-selected').onclick=()=>mutation(p=>{const result=deleteItem(p,selectedId);selectedId=null;return result;});
+}
+function renderFrontage(){
+ $('commercial').checked=!!project.commercial.enabled;
+ $('frontage-panel').hidden=!project.commercial.enabled;
+ $('vehicle-entry').checked=!!project.commercial.vehicleEntrance;
+ $('entry-ratio').value=Math.round(project.commercial.entryRatio*100);
+ const f=frontageAllocation(project);
+ if(!f)return;
+ const el=$('frontage'),segments=[
+  {value:f.left,cls:'store',label:'مغازه ۱'},
+  {value:f.entry,cls:'entry',label:'ورودی مسکونی'},
+  {value:f.right,cls:'store',label:'مغازه ۲'},
+  {value:f.vehicle,cls:'car',label:'سواره'}
+ ];
+ el.innerHTML=segments.filter(a=>a.value>.01).map(a=>'<div title="'+esc(a.label)+' '+fmt(a.value)+' متر" class="'+a.cls+'" style="width:'+(100*a.value/f.length)+'%">'+a.label+'</div>').join('');
+ $('frontage-text').textContent='بر کل: '+fmt(f.length)+' متر · سهم مغازه‌ها: '+fmt(f.left+f.right)+' متر. این تقسیم فقط روی بر خیابان است، نه پلان قابل ساخت مغازه.';
+}
+function renderIssues(){
+ const data=issuesFor(project),n={error:0,warning:0,review:0};data.forEach(i=>n[i.severity]++);
+ $('counts').textContent=fmt(n.error)+' تعارض · '+fmt(n.warning)+' هشدار · '+fmt(n.review)+' بررسی';
+ const elems=data.map((i,j)=>'<div role="button" tabindex="0" class="issue '+i.severity+'" data-issue="'+j+'"><div class="issue-head"><span>'+label[i.severity]+'</span><span>'+esc(i.code)+'</span></div><p>'+esc(i.message)+'</p></div>');
+ $('issues').innerHTML=elems.length?elems.join(''):'<div class="empty">در کنترل‌های فعال تعارضی پیدا نشد. این نتیجه تأیید کامل نیست.</div>';
+ $('issues').querySelectorAll('[data-issue]').forEach(el=>{
+  const act=()=>{if(data[+el.dataset.issue].ids.length){selectedId=data[+el.dataset.issue].ids[0];render();}};
+  el.onclick=act;el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();act()}};
+ });
+}
+function render(){
+ if(!project)return;
+ $('title').textContent=project.site.name+' / هاله‌گذاری';
+ $('site').value=project.site.id;
+ $('site-info').textContent='مساحت: '+fmt(area(project.site.polygon))+' م² · '+project.site.target.floors+' طبقه هدف · '+project.site.edges.filter(e=>e.type==='street').length+' بر خیابان';
+ $('parking').value=String(project.parking.level);
+ $('ramp').checked=!!project.parking.hasRamp;
+ $('column').textContent=project.supports[0]?.deleted?'بازگرداندن ستون پیشنهادی':'حذف ستون پیشنهادی';
+ renderPlan();renderInspector();renderIssues();renderFrontage();refreshActions();
+}
+function svgPoint(e){
+ const pt=svg.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;
+ const mat=svg.getScreenCTM();if(!mat)return null;
+ const q=pt.matrixTransform(mat.inverse());return {x:q.x,y:-q.y};
+}
+svg.addEventListener('pointerdown',e=>{
+ const target=e.target,room=target.closest('[data-room]')?.dataset.room, support=target.closest('[data-support]')?.dataset.support;
+ if(support){mutation(p=>{const s=p.supports.find(s=>s.id===support);if(s)s.deleted=!s.deleted;return p});return;}
+ if(!room){selectedId=null;render();return;}
+ const p=svgPoint(e),item=project.items.find(r=>r.id===room);if(!p||!item)return;
+ selectedId=room;drag={id:room,start:p,initial:copy(item),before:copy(project),resize:!!target.dataset.resize,moved:false};
+ svg.setPointerCapture(e.pointerId);render();e.preventDefault();
+});
+svg.addEventListener('pointermove',e=>{
+ if(!drag)return;const p=svgPoint(e);if(!p)return;
+ const dx=p.x-drag.start.x,dy=p.y-drag.start.y,r=drag.initial;
+ if(Math.hypot(dx,dy)<.03&&!drag.moved)return;
+ const snap=v=>Math.round(v*20)/20;
+ const change=drag.resize?{w:Math.max(.5,snap(r.w+dx)),h:Math.max(.5,snap(r.h+dy))}:{x:snap(r.x+dx),y:snap(r.y+dy)};
+ project=updateItem(project,drag.id,change);drag.moved=true;render();
+});
+function endDrag(e){
+ if(!drag)return;
+ if(svg.hasPointerCapture(e.pointerId))svg.releasePointerCapture(e.pointerId);
+ if(drag.moved && JSON.stringify(drag.before)!==JSON.stringify(project)){undos.push(drag.before);if(undos.length>40)undos.shift();redos=[];persist();}
+ drag=null;render();
+}
+svg.addEventListener('pointerup',endDrag);svg.addEventListener('pointercancel',endDrag);
+$('site').onchange=e=>chooseSite(e.target.value);
+$('new-scheme').onclick=()=>{if(confirm('چینش فعلی به تاریخچه انتقال داده شود و نمونه اولیه از نو ساخته شود؟'))mutation(p=>createProject(p.site));};
+$('reset-view').onclick=()=>{if(confirm('چینش اولیه برگردد؟ این تغییر قابل Undo است.'))mutation(p=>createProject(p.site));};
+$('add').onclick=()=>mutation(p=>{const n=addItem(p,$('new-type').value);selectedId=n.items.at(-1).id;return n;});
+$('undo').onclick=()=>{if(!undos.length)return;redos.push(copy(project));project=undos.pop();persist();render();};
+$('redo').onclick=()=>{if(!redos.length)return;undos.push(copy(project));project=redos.pop();persist();render();};
+$('repair').onclick=()=>{
+ if(!selectedId)return;
+ const result=suggestLocalRepair(project,selectedId);
+ if(!result){alert('امکان بررسی این هاله نیست.');return;}
+ if(!result.changed){alert('برای این هاله، اصلاح موضعی بهتری در جست‌وجوی محدود پیدا نشد.');return;}
+ if(confirm('موقعیت هاله انتخاب‌شده پیشنهاد می‌شود. امتیاز تعارض: '+result.from+' ← '+result.to+'. اعمال شود؟'))mutation(()=>result.project);
+};
+$('bad-bed').onclick=()=>mutation(p=>{
+ const b=bounds(p.footprint),r=p.items.find(i=>i.type==='bedroom');if(!r)return p;
+ r.x=Math.round((b.minX+(b.maxX-b.minX)*.35)*100)/100;
+ r.y=Math.round((b.minY+(b.maxY-b.minY)*.38)*100)/100;
+ selectedId=r.id;return p;
+});
+$('bad-balcony').onclick=()=>mutation(p=>{
+ let r=p.items.find(i=>i.type==='balcony');
+ if(!r){p=addItem(p,'balcony');r=p.items.at(-1);}
+ const b=bounds(p.footprint);
+ r.x=Math.round((b.minX+(b.maxX-b.minX)*.38)*100)/100;
+ r.y=Math.round((b.maxY-r.h-.05)*100)/100;
+ selectedId=r.id;return p;
+});
+$('commercial').onchange=e=>mutation(p=>{p.commercial.enabled=e.target.checked;return p;});
+$('entry-ratio').onchange=e=>mutation(p=>{p.commercial.entryRatio=Math.max(0,Math.min(1,+e.target.value/100));return p;});
+$('vehicle-entry').onchange=e=>mutation(p=>{p.commercial.vehicleEntrance=e.target.checked;return p;});
+$('parking').onchange=e=>mutation(p=>{p.parking.level=+e.target.value;return p;});
+$('ramp').onchange=e=>mutation(p=>{p.parking.hasRamp=e.target.checked;return p;});
+$('column').onclick=()=>mutation(p=>{if(p.supports[0])p.supports[0].deleted=!p.supports[0].deleted;return p;});
+$('download').onclick=()=>{
+ const blob=new Blob([JSON.stringify(project,null,2)],{type:'application/json'});
+ const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='building-studio-'+project.site.id+'.json';a.click();
+ setTimeout(()=>URL.revokeObjectURL(url),250);
+};
+$('upload').onchange=async e=>{
+ const file=e.target.files[0];if(!file)return;
+ try{
+  if(file.size>500000)throw Error('فایل بزرگ است');
+  const loaded=JSON.parse(await file.text());
+  if(!valid(loaded))throw Error('فرمت پرونده Studio نسخه ۱ معتبر نیست');
+  if(!confirm('این پروژه وارد و جایگزین وضعیت نمایشی فعلی شود؟'))return;
+  let found=fixtures.find(s=>s.id===loaded.site.id);
+  if(!found){fixtures.push(loaded.site);const op=document.createElement('option');op.value=loaded.site.id;op.textContent=loaded.site.name;$('site').appendChild(op);}
+  useProject(loaded);$('site').value=loaded.site.id;
+ }catch(err){alert('واردکردن انجام نشد: '+err.message);}
+ finally{e.target.value='';}
+};
+async function init(){
+ try{
+  const response=await fetch('../data/scenarios.json',{cache:'no-store'});if(!response.ok)throw Error('داده زمین‌ها بارگذاری نشد');
+  fixtures=await response.json();
+  $('site').innerHTML=fixtures.map(s=>'<option value="'+esc(s.id)+'">'+esc(s.name)+'</option>').join('');
+  chooseSite(new URL(location.href).searchParams.get('site')||fixtures[0].id);
+ }catch(err){$('title').textContent='خطا در بارگذاری';$('issues').textContent=err.message;}
+}
+init();
