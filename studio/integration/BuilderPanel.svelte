@@ -17,7 +17,7 @@
   };
   type Solution = {
     schema_version: string; engine: string; site_id: string;
-    candidates: Candidate[]; site?: { unsupported?: string };
+    candidates: Candidate[]; site?: { unsupported?: string; footprint?: number[][] };
   };
   let expanded = $state(true);
   let busy = $state(false);
@@ -64,18 +64,25 @@
     try{
       // Make native OpenPlan3D geometry from the actual CI-computed CP-SAT solution.
       const exported = exportToOpenPlan({site,items:candidate.rooms});
+      const positions=candidate.rooms as Array<{x:number;y:number;w:number;h:number}>;
+      const coordinates={
+        minX:Math.min(...positions.map(r=>r.x)),
+        maxY:Math.max(...positions.map(r=>r.y+r.h))
+      };
       const parsed = readProject(exported);
       parsed.name = 'راماچ · ' + site.name + ' · گزینه ' + (variantIndex+1);
       const enriched = parsed as typeof parsed & {builderEvidence?: {
         siteId:string; variant:string; solver:string; status:string;
         wallBaseline:string; pendingChecks:string[];
+        footprint:number[][]; coordinates:{minX:number;maxY:number};
       }};
       enriched.builderEvidence = {
         siteId, variant:candidate.variant||String(variantIndex+1),
         solver:'Google OR-Tools CP-SAT (precomputed)',
         status:candidate.status,
         wallBaseline:wallSignature(parsed.floors[0]),
-        pendingChecks:candidate.not_checked||[]
+        pendingChecks:candidate.not_checked||[],
+        footprint:solutions?.site?.footprint||[], coordinates
       };
       // Preserve the current editable project before switching.
       if(get(currentProject)) await autoSave();
@@ -146,7 +153,7 @@
       {#if review.changed}
         <span class="text-amber-300">دیوارها نسبت به خروجی Solver تغییر کرده‌اند</span>
       {/if}
-      <span class="text-slate-400">{review.warnings} هشدار عملکردی</span>
+      <span class="text-slate-400">{review.errors} تعارض · {review.warnings} هشدار عملکردی</span>
       <button class="border border-slate-600 rounded px-2 py-1 hover:bg-slate-700" onclick={() => checking=!checking}>
         {checking?'بستن جزئیات':'جزئیات کنترل'}
       </button>
