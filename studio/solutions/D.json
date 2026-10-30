@@ -1,0 +1,63 @@
+{
+  "schema_version": "cp-sat-v1",
+  "site_id": "D",
+  "engine": "Google OR-Tools CP-SAT",
+  "solver_dependency_license": "Apache-2.0",
+  "program": "one 2-bedroom apartment",
+  "site": {
+    "id": "D",
+    "siteName": "قطعه قناص",
+    "footprint": [
+      [
+        14,
+        6.274999999999999
+      ],
+      [
+        14,
+        14
+      ],
+      [
+        8,
+        19
+      ],
+      [
+        0,
+        19
+      ],
+      [
+        0,
+        6.274999999999999
+      ]
+    ],
+    "siteArea": [
+      [
+        0,
+        0
+      ],
+      [
+        14,
+        0
+      ],
+      [
+        14,
+        14
+      ],
+      [
+        8,
+        19
+      ],
+      [
+        0,
+        19
+      ]
+    ],
+    "targetUnitCount": 1,
+    "unsupported": "Non-rectangular floorplate requires polygon solver"
+  },
+  "candidates": [
+    {
+      "status": "UNSUPPORTED",
+      "reason": "Non-rectangular floorplate requires polygon solver"
+    }
+  ]
+}

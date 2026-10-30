@@ -1,0 +1,93 @@
+name: Build the actual upstream OpenPlan3D editor
+on:
+  workflow_dispatch:
+  push:
+    branches: [feature/real-open-source-core]
+    paths: [.github/workflows/vendor-openplan.yml]
+permissions:
+  contents: read
+jobs:
+  build-upstream:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Fetch verified MIT upstream at a pinned commit
+        run: |
+          git clone -q https://github.com/laanlabs/openPlan3D.git upstream
+          git -C upstream checkout -q 98f9cb467e4045c6abc5d9880ada1f03dff50c68
+          grep -q 'MIT License' upstream/LICENSE
+      - name: Build a static SPA for GitHub Pages
+        working-directory: upstream
+        run: |
+          npm ci
+          npm install --save-dev @sveltejs/adapter-static@3
+          cat > svelte.config.js <<'EOF'
+          import adapter from '@sveltejs/adapter-static';
+          export default {
+            kit: {
+              adapter: adapter({ pages: 'build', assets: 'build', fallback: 'index.html' }),
+              paths: { base: '/Builder_builder-/studio/editor' },
+              prerender: { entries: [] }
+            }
+          };
+          EOF
+          NODE_ENV=production npm run build
+          test -s build/index.html
+      - name: Import Builder CP-SAT output through upstream readProject validator
+        run: |
+          node --input-type=module <<'JS'
+          import fs from 'node:fs';
+          import { exportToOpenPlan } from './studio/openplan-export.js';
+          const solved=JSON.parse(fs.readFileSync('studio/solutions/A.json','utf8'));
+          const doc=exportToOpenPlan({site:{id:'A',name:'Test fixture'},items:solved.candidates[0].rooms});
+          fs.writeFileSync('upstream/builder-fixture.json',JSON.stringify(doc));
+          JS
+          cat > upstream/tests/builder-bridge.test.ts <<'EOF'
+          import { test, expect } from 'vitest';
+          import fs from 'node:fs';
+          import { readProject } from '../src/lib/utils/projectValidation';
+          test('Builder CP-SAT output imports through the real OpenPlan3D project parser', () => {
+            const input=JSON.parse(fs.readFileSync(new URL('../builder-fixture.json',import.meta.url),'utf8'));
+            const project=readProject(input);
+            expect(project.floors).toHaveLength(1);
+            expect(project.floors[0].walls.length).toBeGreaterThan(15);
+            expect(project.floors[0].doors.length).toBeGreaterThanOrEqual(5);
+            expect(project.floors[0].rooms).toHaveLength(7);
+          });
+          EOF
+          cd upstream && npx vitest run tests/builder-bridge.test.ts
+      - name: Prepare output + retained license
+        run: |
+          mkdir -p editor-dist
+          cp -a upstream/build/. editor-dist/
+          cp upstream/LICENSE editor-dist/LICENSE.openplan3d
+          printf '%s\n' 'Upstream: https://github.com/laanlabs/openPlan3D' 'Commit: 98f9cb467e4045c6abc5d9880ada1f03dff50c68' 'License: MIT (see LICENSE.openplan3d)' 'Built static under /Builder_builder-/studio/editor/' > editor-dist/UPSTREAM.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: openplan-editor-static
+          path: editor-dist/
+          retention-days: 7
+  publish:
+    needs: build-upstream
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/real-open-source-core
+      - uses: actions/download-artifact@v4
+        with:
+          name: openplan-editor-static
+          path: studio/editor
+      - name: Commit real build (not a recreated mock)
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f studio/editor
+          git diff --cached --quiet && exit 0
+          git commit -m "vendor: publish pinned MIT OpenPlan3D static editor"
+          git push origin HEAD:feature/real-open-source-core

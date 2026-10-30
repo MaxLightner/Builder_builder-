@@ -1,0 +1,55 @@
+{
+  "schema_version": "cp-sat-v1",
+  "site_id": "E",
+  "engine": "Google OR-Tools CP-SAT",
+  "solver_dependency_license": "Apache-2.0",
+  "program": "one 2-bedroom apartment",
+  "site": {
+    "id": "E",
+    "siteName": "رو به فضای سبز",
+    "footprint": [
+      [
+        20,
+        10.499999999999996
+      ],
+      [
+        20,
+        30
+      ],
+      [
+        0,
+        30
+      ],
+      [
+        0,
+        10.499999999999996
+      ]
+    ],
+    "siteArea": [
+      [
+        0,
+        0
+      ],
+      [
+        20,
+        0
+      ],
+      [
+        20,
+        30
+      ],
+      [
+        0,
+        30
+      ]
+    ],
+    "targetUnitCount": 3,
+    "unsupported": "Multi-unit floor not yet modeled; solver must not pretend one unit is the whole floor"
+  },
+  "candidates": [
+    {
+      "status": "UNSUPPORTED",
+      "reason": "Multi-unit floor not yet modeled; solver must not pretend one unit is the whole floor"
+    }
+  ]
+}

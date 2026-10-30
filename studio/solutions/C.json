@@ -1,0 +1,55 @@
+{
+  "schema_version": "cp-sat-v1",
+  "site_id": "C",
+  "engine": "Google OR-Tools CP-SAT",
+  "solver_dependency_license": "Apache-2.0",
+  "program": "one 2-bedroom apartment",
+  "site": {
+    "id": "C",
+    "siteName": "خانه در نبش",
+    "footprint": [
+      [
+        16,
+        6.999999999999998
+      ],
+      [
+        16,
+        20
+      ],
+      [
+        0,
+        20
+      ],
+      [
+        0,
+        6.9999999999999964
+      ]
+    ],
+    "siteArea": [
+      [
+        0,
+        0
+      ],
+      [
+        16,
+        0
+      ],
+      [
+        16,
+        20
+      ],
+      [
+        0,
+        20
+      ]
+    ],
+    "targetUnitCount": 2,
+    "unsupported": "Multi-unit floor not yet modeled; solver must not pretend one unit is the whole floor"
+  },
+  "candidates": [
+    {
+      "status": "UNSUPPORTED",
+      "reason": "Multi-unit floor not yet modeled; solver must not pretend one unit is the whole floor"
+    }
+  ]
+}
