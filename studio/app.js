@@ -1,4 +1,5 @@
 import {area,bounds} from '../geometry.js';
+import {exportToOpenPlan} from './openplan-export.js';
 import {createProject,issuesFor,facadeAnalysis,updateItem,deleteItem,addItem,suggestLocalRepair,categories,frontageAllocation} from './engine.js';
 const $=id=>document.getElementById(id);
 const svg=$('plan');
@@ -254,6 +255,16 @@ $('vehicle-entry').onchange=e=>mutation(p=>{p.commercial.vehicleEntrance=e.targe
 $('parking').onchange=e=>mutation(p=>{p.parking.level=+e.target.value;return p;});
 $('ramp').onchange=e=>mutation(p=>{p.parking.hasRamp=e.target.checked;return p;});
 $('column').onclick=()=>mutation(p=>{if(p.supports[0])p.supports[0].deleted=!p.supports[0].deleted;return p;});
+$('download-openplan').onclick=()=>{
+ try{
+  const data=exportToOpenPlan(project);
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob),link=document.createElement('a');
+  link.href=url;link.download='builder-openplan-'+project.site.id+'.openplan.json';link.click();
+  setTimeout(()=>URL.revokeObjectURL(url),250);
+  alert('فایل دیوارها و درهای پیشنهادی آماده شد. وارد ویرایشگر OpenPlan3D شوید و از Import JSON همین فایل را انتخاب کنید. نورگیری قانونی و سازه هنوز تأیید نشده‌اند.');
+ }catch(err){alert('تبدیل طرح انجام نشد: '+err.message);}
+};
 $('download').onclick=()=>{
  const blob=new Blob([JSON.stringify(project,null,2)],{type:'application/json'});
  const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='building-studio-'+project.site.id+'.json';a.click();
