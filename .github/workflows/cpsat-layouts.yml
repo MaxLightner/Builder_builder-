@@ -1,0 +1,52 @@
+name: Solve real single-unit layouts with OR-Tools CP-SAT
+on:
+  workflow_dispatch:
+  push:
+    branches: [feature/real-open-source-core]
+    paths: [.github/workflows/cpsat-layouts.yml]
+permissions:
+  contents: read
+jobs:
+  solve-and-verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/real-open-source-core
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install ortools==9.14.6206
+      - name: Real site adapter (no guessed bounding boxes)
+        run: node studio/solver/export-input.mjs
+      - name: Solve real 2-bedroom constraints + validate resulting geometry
+        run: python studio/solver/generate.py studio/solver/input.json studio/solutions
+      - name: Independently test candidate JSON files
+        run: node --test tests/studio-cpsat.test.js
+      - uses: actions/upload-artifact@v4
+        with:
+          name: solved-layouts
+          path: studio/solutions
+          retention-days: 7
+  publish:
+    needs: solve-and-verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/real-open-source-core
+      - uses: actions/download-artifact@v4
+        with:
+          name: solved-layouts
+          path: studio/solutions
+      - name: Publish verified solver results for static Pages UI
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add studio/solutions
+          git diff --cached --quiet && exit 0
+          git commit -m "generated: verified CP-SAT layouts from real site data"
+          git push origin HEAD:feature/real-open-source-core
