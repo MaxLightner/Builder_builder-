@@ -44,7 +44,7 @@ test('overbuild remains optional, never treated as authorized',()=>{
     const extra=stageOneOptions(site,{allowExcess:true,extraPercent:10})[0];
     assert.equal(base.assumptions.targetCoveragePercent,65);
     assert.equal(extra.assumptions.targetCoveragePercent,75);
-    assert.match(extra.assumptions.legalStatus,/not assessed/);
+    assert.match(extra.assumptions.legalStatus,/NOT sourced from municipality|not independently verified/);
     assert.ok(extra.areas.excessFootprint>0);
     assert.equal(base.areas.excessFootprint,0);
   }
