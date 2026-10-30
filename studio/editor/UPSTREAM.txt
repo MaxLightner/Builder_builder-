@@ -1,0 +1,4 @@
+Upstream: https://github.com/laanlabs/openPlan3D
+Commit: 98f9cb467e4045c6abc5d9880ada1f03dff50c68
+License: MIT (see LICENSE.openplan3d)
+Built static under /Builder_builder-/studio/editor/
