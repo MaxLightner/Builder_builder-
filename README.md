@@ -70,3 +70,12 @@ A deterministic experimental rough-structure model is attached to every Stage 1 
 - Exported Design JSON contains columns with coordinates and sections, slabs and elevations, approximate beams, core polygons, parking bay polygons and count, and explicit incomplete-engineering validation flags.
 
 **Not delivered:** engineered structural calculations, confirmed column/beam section sizes, actual stair flights and risers, lift technical dimensions, fire egress, ramps/basements, turning-envelope simulation, full-code compliance, architectural room walls or a construction-ready structural drawing. The three A/B/C strategies remain comparative *concept* schemes, not approved options. Never treat the number of cars as an official permit capacity.
+
+
+## Design-check Studio v0.1 (independent research vertical slice, 2026-10-30)
+
+- **[Open Studio on GitHub Pages](https://maxlightner.github.io/Builder_builder-/studio/)** (requires Pages main/root to have deployed).
+- Source: [studio/](studio/) • [implementation and scope](studio/README.md) • [GitHub PR #1](https://github.com/MaxLightner/Builder_builder-/pull/1).
+- Site geometry and Stage 1 footprint are reused from this repo. The new static Studio supports editable conceptual halos, geometric/contextual issue detection, local one-halo repair proposals, parking/ramp and commercial-frontage screening, project JSON, local persistence, and Undo/Redo.
+- Genuine upstream MIT code reuse: a connected-wall resize core from OpenPlan3D under studio/vendor/ with attribution and tests. It is **not yet connected to the studio UI**.
+- **Not a full architecture solver, code compliance engine, or completed floor-plan editor.** Do not silently replace, discard, or rewrite this vertical slice; develop by adapters, tests and preserved design-model versions.
