@@ -59,7 +59,8 @@ export function facadeAnalysis(project){
     return {a:p,b:q,normal:n,length:len,kind,label,hit};
   });
 }
-function faceContact(rect,facade,tol=0.65){
+function faceContact(rect,facade,tol=1.05){
+  if(Math.abs(facade.b[0]-facade.a[0])>0.2&&Math.abs(facade.b[1]-facade.a[1])>0.2)return false; // curved/diagonal facades not evaluated in v0.1
   const a=facade.a,b=facade.b,dx=b[0]-a[0],dy=b[1]-a[1];
   if(Math.abs(dx)>=Math.abs(dy)){
     const y=a[1],distance=Math.min(Math.abs(rect.y-y),Math.abs(rect.y+rect.h-y)),
@@ -89,7 +90,7 @@ export function createProject(site){
     {id:id(),type:'living',label:'پذیرایی',...C(b.minX+W*.52,b.minY+H*.40,W*.44,H*.35)},
     {id:id(),type:'kitchen',label:'آشپزخانه',...C(b.minX+W*.04,b.minY+H*.40,W*.32,H*.28)},
     {id:id(),type:'core',label:'پله / آسانسور',...C(b.minX+W*.04,b.minY+H*.74,W*.32,H*.22)},
-    {id:id(),type:'corridor',label:'راهرو',...C(b.minX+W*.39,b.minY+H*.03,W*.095,H*.92)}
+    {id:id(),type:'corridor',label:'راهرو',...C(b.minX+W*.39,b.minY+H*.03,W*.11,H*.92)}
   ];
   return {version:1,site:structuredClone(site),footprint:structuredClone(footprint),items,
     entrance:{x:round(b.minX+W*.44),y:round(b.minY),kind:'residential'},
@@ -101,6 +102,7 @@ export function issuesFor(project){
   const issues=[],items=project.items||[],facades=facadeAnalysis(project);
   const report=(severity,code,ids,message)=>issues.push({severity,code,ids,message});
   const core=items.find(r=>r.type==='core'),hall=items.find(r=>r.type==='corridor');
+  if(facades.some(f=>Math.abs(f.b[0]-f.a[0])>0.2&&Math.abs(f.b[1]-f.a[1])>0.2))report('review','DIAGONAL_FACADE',[],'ارزیابی تماس با جبهه مایل هنوز در این نسخه پیاده‌سازی نشده است.');
   for(const r of items){
     if(!rectangleInPolygon(r,project.footprint))report('error','OUTSIDE',[r.id],r.label+' از محدوده ساختمان خارج شده است.');
     const min=minDimensions[r.type];
@@ -134,7 +136,11 @@ export function issuesFor(project){
     if(!project.parking.hasRamp)report('error','RAMP_MISSING',[],'پارکینگ در تراز متفاوت از معبر است اما ارتباط سواره تعریف نشده.');
     else report('review','RAMP_UNCHECKED',[],'رمپ ثبت شده اما شیب، طول، شعاع گردش و ارتفاع مفید هنوز محاسبه نشده‌اند.');
   }
-  if(project.commercial?.enabled)report('review','MIXED_USE_UNCHECKED',[],'تفکیک ورودی تجاری/مسکونی و تأمین خروج/پارکینگ هنوز بررسی تخصصی نشده‌اند.');
+  if(project.commercial?.enabled){
+    const front=frontageAllocation(project);
+    if(front && [front.left,front.right].some(w=>w>0&&w<2.2))report('warning','NARROW_SHOP',[],'تقسیم پیشنهادی بر خیابان، عرض بسیار کمی برای یکی از مغازه‌ها گذاشته است (معیار آزمایشی).');
+    report('review','MIXED_USE_UNCHECKED',[],'تفکیک ورودی تجاری/مسکونی و تأمین خروج/پارکینگ هنوز بررسی تخصصی نشده‌اند.');
+  }
   report('review','REGULATIONS_UNCHECKED',[],'ضوابط محلی، نورگیری قانونی و سازه تأیید نشده‌اند؛ مدل فعلاً مفهومی است.');
   return issues;
 }
