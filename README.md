@@ -79,3 +79,17 @@ A deterministic experimental rough-structure model is attached to every Stage 1 
 - Site geometry and Stage 1 footprint are reused from this repo. The new static Studio supports editable conceptual halos, geometric/contextual issue detection, local one-halo repair proposals, parking/ramp and commercial-frontage screening, project JSON, local persistence, and Undo/Redo.
 - Genuine upstream MIT code reuse: a connected-wall resize core from OpenPlan3D under studio/vendor/ with attribution and tests. It is **not yet connected to the studio UI**.
 - **Not a full architecture solver, code compliance engine, or completed floor-plan editor.** Do not silently replace, discard, or rewrite this vertical slice; develop by adapters, tests and preserved design-model versions.
+
+
+## Real source integration — October 30, 2026
+
+Building Studio is additive and versioned; the original Site/Stage 1 application remains available.
+
+- [Editable spatial Studio](studio/): when supported, it displays genuine OR-Tools CP-SAT candidate layouts, not hardcoded room percentages.
+- [Full OpenPlan3D editor](studio/editor/): a pinned, unmodified MIT source application built for static GitHub Pages; users can draw precise walls, doors and windows and see 2D/3D. Source is reproducibly fetched and built by [.github/workflows/vendor-openplan.yml](.github/workflows/vendor-openplan.yml), with upstream SHA and MIT attribution retained.
+- [CP-SAT solver](studio/solver/generate.py): actual Google OR-Tools constraint solving. Generated results are checked before [publishing](studio/solutions/). Current frontend reads CI-computed examples because GitHub Pages cannot execute Python; it does NOT rerun CP-SAT interactively.
+- [Bridge](studio/openplan-export.js): export current candidate as an importable OpenPlan3D project containing wall loops, deduplicated shared edges, suggested doors and room labels.
+
+**Current proof:** site A, single-unit 2-bedroom rectangular floor only. Other multi-unit / irregular samples return explicit UNSUPPORTED. Geometry, use, daylight quality, structural safety, ramp and Iran building-code compliance still require additional models and verification. See [scope, licenses and limitations](studio/README.md).
+
+**No reset:** keep the original app, Site data, previously saved Studio projects, dependency licenses, build scripts, generated outputs, source history and CI checks. Future editor customization should be maintained as reproducible upstream patches, not random edits to compiled bundles.
