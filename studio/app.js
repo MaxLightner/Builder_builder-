@@ -19,9 +19,18 @@ function recover(site){
  return createProject(site);
 }
 function valid(p){
- return p&&p.version===1&&p.site&&Array.isArray(p.site.polygon)&&Array.isArray(p.site.edges)&&Array.isArray(p.footprint)&&
- p.footprint.length>=3&&Array.isArray(p.items)&&p.items.length<=80&&p.items.every(r=>r&&typeof r.id==='string'&&typeof r.type==='string'&&[r.x,r.y,r.w,r.h].every(Number.isFinite)&&r.w>0&&r.h>0)&&
- p.parking&&p.commercial&&Array.isArray(p.supports)&&p.supports.length<100;
+ const points=v=>Array.isArray(v)&&v.length>=3&&v.length<=32&&v.every(q=>Array.isArray(q)&&q.length===2&&q.every(n=>Number.isFinite(n)&&Math.abs(n)<10000));
+ return !!(p&&p.version===1&&p.site&&typeof p.site.id==='string'&&p.site.id.length<80&&
+ typeof p.site.name==='string'&&p.site.name.length<200&&points(p.site.polygon)&&
+ Array.isArray(p.site.edges)&&p.site.edges.length===p.site.polygon.length&&
+ p.site.edges.every(e=>e&&['street','open','neighbor'].includes(e.type)&&
+ ['good','medium','poor'].includes(e.view))&&points(p.footprint)&&
+ Array.isArray(p.items)&&p.items.length<=80&&p.items.every(r=>r&&typeof r.id==='string'&&r.id.length<80&&
+ typeof r.type==='string'&&typeof r.label==='string'&&r.label.length<200&&
+ [r.x,r.y,r.w,r.h].every(n=>Number.isFinite(n)&&Math.abs(n)<10000)&&r.w>0&&r.h>0)&&
+ p.parking&&Number.isInteger(p.parking.level)&&p.commercial&&Number.isFinite(p.commercial.entryRatio)&&
+ p.commercial.entryRatio>=0&&p.commercial.entryRatio<=1&&Array.isArray(p.supports)&&
+ p.supports.length<100&&p.supports.every(s=>s&&Number.isFinite(s.x)&&Number.isFinite(s.y)));
 }
 function useProject(p,select=null){
  project=p;selectedId=select;undos=[];redos=[];persist();render();
