@@ -175,3 +175,20 @@ export function addItem(project,type){
  next.items.push({id:'r'+Math.random().toString(36).slice(2,10),type,label:(categories[type]||type)+' '+counter,...C(b.minX+.5,b.minY+.5,3,3)});
  return next;
 }
+
+
+// Frontage is a one-dimensional shared resource, not a decorative doorway.
+// Deliberately separate from room geometry until legal build-to line is provided.
+export function frontageAllocation(project){
+ const candidates=project.site.edges.map((e,i)=>({e,i})).filter(o=>o.e.type==='street');
+ if(!candidates.length)return null;
+ const best=candidates.sort((a,b)=>{
+   const a0=project.site.polygon[a.i],a1=project.site.polygon[(a.i+1)%project.site.polygon.length];
+   const b0=project.site.polygon[b.i],b1=project.site.polygon[(b.i+1)%project.site.polygon.length];
+   return Math.hypot(b1[0]-b0[0],b1[1]-b0[1])-Math.hypot(a1[0]-a0[0],a1[1]-a0[1]);
+ })[0];
+ const a=project.site.polygon[best.i],b=project.site.polygon[(best.i+1)%project.site.polygon.length];
+ const length=Math.hypot(b[0]-a[0],b[1]-a[1]),entry=1.6,vehicle=project.commercial.vehicleEntrance?2.8:0;
+ const free=Math.max(0,length-entry-vehicle),left=Math.max(0,Math.min(free,(length-entry-vehicle)*project.commercial.entryRatio));
+ return {length:round(length),entry,vehicle,left:round(left),right:round(Math.max(0,free-left)),edgeIndex:best.i};
+}
