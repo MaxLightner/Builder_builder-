@@ -7,6 +7,9 @@ on:
       - .github/workflows/vendor-openplan.yml
       - studio/integration/**
       - studio/openplan-export.js
+concurrency:
+  group: openplan-native-${{ github.ref }}
+  cancel-in-progress: true
 permissions:
   contents: read
 jobs:
