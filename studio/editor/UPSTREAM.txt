@@ -1,3 +1,4 @@
+Builder native integration applied from studio/integration/patch-openplan.mjs
 Upstream: https://github.com/laanlabs/openPlan3D
 Commit: 98f9cb467e4045c6abc5d9880ada1f03dff50c68
 License: MIT (see LICENSE.openplan3d)

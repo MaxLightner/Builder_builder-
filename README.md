@@ -1,3 +1,14 @@
+## Building Studio — unified editor (pending CI release)
+
+The primary route [Building Studio](https://maxlightner.github.io/Builder_builder-/studio/) now directs to **one native OpenPlan3D editing workspace**, with a small Builder site/scheme selector inside the editor itself. Choosing a verified precomputed OR-Tools candidate creates a new, immediately editable OpenPlan3D project **without exporting or importing a file**. Current edited wall/room/window data is fed back to a limited design-check panel, and the shared footprint is retained for envelope warnings.
+
+- Source patch: [studio/integration/patch-openplan.mjs](studio/integration/patch-openplan.mjs); component: [BuilderPanel.svelte](studio/integration/BuilderPanel.svelte)
+- Earlier standalone halo UI remains archived at [studio/legacy.html](studio/legacy.html) for rollback, not a second production workflow.
+- CP-SAT is not interactive after each edit on GitHub Pages; a new backend/WASM solve adapter remains unfinished. This is not an architecturally certified or fully optimized plan.
+- The route replaces the old experience **only after the pinned upstream build, import-validation and GitHub Pages deployment are successful**.
+
+---
+
 # Building Lab — Stage 0 + Stage 1 Rough Structure
 
 محیط آزمایشی مرحله‌ای طراحی ساختمان، بدون API هوش مصنوعی و بدون Solver. رابط فارسی و راست‌به‌چپ، پنج سناریوی واقع‌نما، پلان SVG و مدل WebGL با Three.js و OrbitControls.

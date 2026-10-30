@@ -2,8 +2,14 @@ name: Build the actual upstream OpenPlan3D editor
 on:
   workflow_dispatch:
   push:
-    branches: [feature/real-open-source-core]
-    paths: [.github/workflows/vendor-openplan.yml]
+    branches: [main, feature/unified-studio-native-editor]
+    paths:
+      - .github/workflows/vendor-openplan.yml
+      - studio/integration/**
+      - studio/openplan-export.js
+concurrency:
+  group: openplan-native-${{ github.ref }}
+  cancel-in-progress: true
 permissions:
   contents: read
 jobs:
@@ -19,6 +25,8 @@ jobs:
           git clone -q https://github.com/laanlabs/openPlan3D.git upstream
           git -C upstream checkout -q 98f9cb467e4045c6abc5d9880ada1f03dff50c68
           grep -q 'MIT License' upstream/LICENSE
+      - name: Integrate Builder controls into native editor source
+        run: node studio/integration/patch-openplan.mjs upstream
       - name: Build a static SPA for GitHub Pages
         working-directory: upstream
         run: |
@@ -64,7 +72,7 @@ jobs:
           mkdir -p editor-dist
           cp -a upstream/build/. editor-dist/
           cp upstream/LICENSE editor-dist/LICENSE.openplan3d
-          printf '%s\n' 'Upstream: https://github.com/laanlabs/openPlan3D' 'Commit: 98f9cb467e4045c6abc5d9880ada1f03dff50c68' 'License: MIT (see LICENSE.openplan3d)' 'Built static under /Builder_builder-/studio/editor/' > editor-dist/UPSTREAM.txt
+          printf '%s\n' 'Builder native integration applied from studio/integration/patch-openplan.mjs' 'Upstream: https://github.com/laanlabs/openPlan3D' 'Commit: 98f9cb467e4045c6abc5d9880ada1f03dff50c68' 'License: MIT (see LICENSE.openplan3d)' 'Built static under /Builder_builder-/studio/editor/' > editor-dist/UPSTREAM.txt
       - uses: actions/upload-artifact@v4
         with:
           name: openplan-editor-static
@@ -78,7 +86,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: feature/real-open-source-core
+          ref: ${{ github.ref_name }}
       - uses: actions/download-artifact@v4
         with:
           name: openplan-editor-static
@@ -90,4 +98,4 @@ jobs:
           git add -f studio/editor
           git diff --cached --quiet && exit 0
           git commit -m "vendor: publish pinned MIT OpenPlan3D static editor"
-          git push origin HEAD:feature/real-open-source-core
+          git push origin HEAD:${{ github.ref_name }}
