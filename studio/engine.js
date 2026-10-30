@@ -94,7 +94,7 @@ export function createProject(site){
   ];
   return {version:1,site:structuredClone(site),footprint:structuredClone(footprint),items,
     entrance:{x:round(b.minX+W*.44),y:round(b.minY),kind:'residential'},
-    commercial:{enabled:false,entryRatio:0.5},parking:{level:0,hasRamp:false},
+    commercial:{enabled:false,entryRatio:0.5,vehicleEntrance:true},parking:{level:0,hasRamp:false},
     supports:[{id:'s1',x:round(b.minX+W*.1),y:round(b.minY+H*.84),deleted:false,carriesUpperLevels:true}],
     assumptions:{coverage:'demo 65%',buildingLine:'stage1 demo; not verified'},stage:'intent'};
 }
