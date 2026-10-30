@@ -7,6 +7,17 @@ export function wallSignature(floor){
     .map(w=>[w.id,w.start.x,w.start.y,w.end.x,w.end.y,w.thickness,w.height])
     .sort((a,b)=>String(a[0]).localeCompare(String(b[0]))));
 }
+function pointWithin(poly,p){
+  let inside=false;
+  for(let i=0,j=poly.length-1;i<poly.length;j=i++){
+    const a=poly[i],b=poly[j];
+    const cross=(p[0]-a[0])*(b[1]-a[1])-(p[1]-a[1])*(b[0]-a[0]);
+    if(Math.abs(cross)<1e-7&&p[0]>=Math.min(a[0],b[0])-1e-7&&p[0]<=Math.max(a[0],b[0])+1e-7&&
+       p[1]>=Math.min(a[1],b[1])-1e-7&&p[1]<=Math.max(a[1],b[1])+1e-7)return true;
+    if((a[1]>p[1])!==(b[1]>p[1])&&p[0]<(b[0]-a[0])*(p[1]-a[1])/(b[1]-a[1])+a[0])inside=!inside;
+  }
+  return inside;
+}
 export function reviewNativePlan(project){
   const result={messages:[],errors:0,warnings:0,source:'native edited OpenPlan3D model',changed:false};
   if(!project?.floors?.length)return result;
@@ -18,6 +29,17 @@ export function reviewNativePlan(project){
     result.changed=true;
     result.warnings++;
     result.messages.push({code:'SOLVER_PROVENANCE_STALE',level:'warning',text:'پس از ویرایش دیوارها، قیود Solver دوباره حل نشده‌اند؛ ارزیابی اولیه دیگر تأیید این هندسه نیست.'});
+  }
+  if(builder?.footprint?.length>=3 && builder?.coordinates){
+    const {minX,maxY}=builder.coordinates;
+    const actual=p=>[minX+p.x/100,maxY-p.y/100];
+    const escaped=floor.walls.filter(w=>!pointWithin(builder.footprint,actual(w.start))||
+      !pointWithin(builder.footprint,actual(w.end)));
+    if(escaped.length){
+      result.errors++;
+      result.messages.push({code:'OUTSIDE_FOOTPRINT',level:'error',
+        text:escaped.length+' دیوار از محدوده ساختمانی تعریف‌شده خارج شده است. این کنترل صرفاً هندسی است.'});
+    }
   }
   const wallIds=new Set(floor.walls.map(w=>w.id));
   const windowsByWall=new Set((floor.windows||[]).map(w=>w.wallId));
