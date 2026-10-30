@@ -36,6 +36,29 @@ jobs:
           EOF
           NODE_ENV=production npm run build
           test -s build/index.html
+      - name: Import Builder CP-SAT output through upstream readProject validator
+        run: |
+          node --input-type=module <<'JS'
+          import fs from 'node:fs';
+          import { exportToOpenPlan } from './studio/openplan-export.js';
+          const solved=JSON.parse(fs.readFileSync('studio/solutions/A.json','utf8'));
+          const doc=exportToOpenPlan({site:{id:'A',name:'Test fixture'},items:solved.candidates[0].rooms});
+          fs.writeFileSync('upstream/builder-fixture.json',JSON.stringify(doc));
+          JS
+          cat > upstream/tests/builder-bridge.test.ts <<'EOF'
+          import { test, expect } from 'vitest';
+          import fs from 'node:fs';
+          import { readProject } from '../src/lib/utils/projectValidation';
+          test('Builder CP-SAT output imports through the real OpenPlan3D project parser', () => {
+            const input=JSON.parse(fs.readFileSync(new URL('../builder-fixture.json',import.meta.url),'utf8'));
+            const project=readProject(input);
+            expect(project.floors).toHaveLength(1);
+            expect(project.floors[0].walls.length).toBeGreaterThan(15);
+            expect(project.floors[0].doors.length).toBeGreaterThanOrEqual(5);
+            expect(project.floors[0].rooms).toHaveLength(7);
+          });
+          EOF
+          cd upstream && npx vitest run tests/builder-bridge.test.ts
       - name: Prepare output + retained license
         run: |
           mkdir -p editor-dist
