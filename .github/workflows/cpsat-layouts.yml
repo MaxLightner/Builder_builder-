@@ -1,4 +1,5 @@
 name: Solve real single-unit layouts with OR-Tools CP-SAT
+# Source regression tests are required before solution JSON may be published.
 on:
   workflow_dispatch:
   push:
