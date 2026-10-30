@@ -1,3 +1,24 @@
+# Unified Building Studio — native OpenPlan3D canvas (2026-10-30)
+
+**Single entry:** \`/Builder_builder-/studio/\` redirects into the **same OpenPlan3D editor** with a small native Builder bar. There is no more separate planning canvas, file download or manual Import between two environments. The old page is preserved at \`studio/legacy.html\` for audit/rollback, not part of the primary workflow.
+
+## One project, one editable model
+
+1. User chooses a Builder site and one of the **real OR-Tools CP-SAT precomputed** candidates in the compact top Builder bar.
+2. Clicking "ایجاد طرح در همین ویرایشگر" runs \`exportToOpenPlan\`, validates the resulting document with upstream \`readProject\`, saves it as **a new native OpenPlan3D project** through \`localStore.saveCopy\`, and calls \`loadProject\` to display the editable walls and doors immediately in the **same canvas**.
+3. All changes now happen in the native editor: walls, endpoints, windows, doors, multi-floor and 2D/3D. Each new candidate creates a new saved copy rather than replacing prior work.
+4. The Builder bar reads the currently edited \`currentProject\` and runs limited checks for missing doors/windows, movement outside the **shared Builder footprint** and a changed wall signature since CP-SAT. It explicitly marks unverified items instead of reporting a valid building.
+
+### How integration is maintained
+The complete pinned MIT editor is compiled by \`.github/workflows/vendor-openplan.yml\`. **Before build**, \`studio/integration/patch-openplan.mjs\` copies \`BuilderPanel.svelte\`, \`openplan-export.js\` and \`native-check.js\` into upstream and changes only two documented Svelte route anchors. The script fails if upstream source structure changes. No manual edits to generated/minified bundles.
+
+- No unrelated changes to Site data, original Builder Stage 1, solver JSON, or existing user projects.
+- Tests in \`tests/studio-unified.test.js\` validate the native model and geometrical checks; the upstream build validates the generated project with the original importer.
+- **Major remaining limitation:** OR-Tools runs in CI, not live in GitHub Pages. The editor reads the precomputed solutions, and later edits are checked but **do not re-solve** CP-SAT. A real backend/WASM solver adapter is a separate next milestone. Currently only site A has supported candidates.
+- No certified daylight, structural model, legal code compliance, parking geometry or full architectural design quality is implied.
+
+---
+
 # Building Studio — real upstream editor + CP-SAT feasibility v0.2
 
 **Status (2026-10-30): executable initial integration, NOT a completed architectural planning product.**
