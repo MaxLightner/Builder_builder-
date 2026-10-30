@@ -1,0 +1,348 @@
+{
+  "schema_version": "cp-sat-v1",
+  "site_id": "A",
+  "engine": "Google OR-Tools CP-SAT",
+  "solver_dependency_license": "Apache-2.0",
+  "program": "one 2-bedroom apartment",
+  "site": {
+    "id": "A",
+    "siteName": "حیاط جنوبی",
+    "footprint": [
+      [
+        10,
+        6.9999999999999964
+      ],
+      [
+        10,
+        20
+      ],
+      [
+        0,
+        20
+      ],
+      [
+        0,
+        6.9999999999999964
+      ]
+    ],
+    "siteArea": [
+      [
+        0,
+        0
+      ],
+      [
+        10,
+        0
+      ],
+      [
+        10,
+        20
+      ],
+      [
+        0,
+        20
+      ]
+    ],
+    "targetUnitCount": 1,
+    "width": 10,
+    "depth": 13.000000000000004,
+    "origin": [
+      0,
+      6.9999999999999964
+    ],
+    "tangent": [
+      1,
+      0
+    ],
+    "inward": [
+      0,
+      1
+    ],
+    "frontage": {
+      "kind": "open",
+      "view": "medium",
+      "source": "Builder site edge; not legal daylight approval"
+    }
+  },
+  "candidates": [
+    {
+      "status": "OPTIMAL",
+      "rooms": [
+        {
+          "id": "living",
+          "label": "پذیرایی",
+          "type": "living",
+          "x": 0.0,
+          "y": 7.0,
+          "w": 4.0,
+          "h": 3.75
+        },
+        {
+          "id": "bedroom_1",
+          "label": "خواب ۱",
+          "type": "bedroom",
+          "x": 4.0,
+          "y": 7.0,
+          "w": 3.0,
+          "h": 3.75
+        },
+        {
+          "id": "bedroom_2",
+          "label": "خواب ۲",
+          "type": "bedroom",
+          "x": 7.0,
+          "y": 7.0,
+          "w": 3.0,
+          "h": 3.75
+        },
+        {
+          "id": "corridor",
+          "label": "راهرو",
+          "type": "corridor",
+          "x": 0.0,
+          "y": 10.75,
+          "w": 10.0,
+          "h": 1.25
+        },
+        {
+          "id": "core",
+          "label": "پله و آسانسور",
+          "type": "core",
+          "x": 5.75,
+          "y": 12.0,
+          "w": 3.25,
+          "h": 4.5
+        },
+        {
+          "id": "kitchen",
+          "label": "آشپزخانه",
+          "type": "kitchen",
+          "x": 0.0,
+          "y": 12.0,
+          "w": 4.0,
+          "h": 3.0
+        },
+        {
+          "id": "bath",
+          "label": "سرویس",
+          "type": "bath",
+          "x": 4.0,
+          "y": 12.0,
+          "w": 1.75,
+          "h": 2.25
+        }
+      ],
+      "metrics": {
+        "objective": 10.0,
+        "width_m": 10.0,
+        "depth_m": 13.0,
+        "unassigned_m2": 49.44
+      },
+      "hard_constraints": [
+        "no overlap",
+        "minimum dimensions",
+        "all three living/bedroom rooms touch exposed facade",
+        "all rooms touch real corridor band",
+        "kitchen/bath share wall",
+        "core has full depth"
+      ],
+      "not_checked": [
+        "real entrance and doors",
+        "actual window sizes and daylight",
+        "structure",
+        "parking",
+        "local building code",
+        "fire safety",
+        "plumbing",
+        "real stair/elevator geometry"
+      ],
+      "variant": "living-bedroom_1-bedroom_2"
+    },
+    {
+      "status": "OPTIMAL",
+      "rooms": [
+        {
+          "id": "bedroom_1",
+          "label": "خواب ۱",
+          "type": "bedroom",
+          "x": 0.0,
+          "y": 7.0,
+          "w": 2.75,
+          "h": 3.75
+        },
+        {
+          "id": "living",
+          "label": "پذیرایی",
+          "type": "living",
+          "x": 2.75,
+          "y": 7.0,
+          "w": 4.25,
+          "h": 3.75
+        },
+        {
+          "id": "bedroom_2",
+          "label": "خواب ۲",
+          "type": "bedroom",
+          "x": 7.0,
+          "y": 7.0,
+          "w": 3.0,
+          "h": 3.75
+        },
+        {
+          "id": "corridor",
+          "label": "راهرو",
+          "type": "corridor",
+          "x": 0.0,
+          "y": 10.75,
+          "w": 10.0,
+          "h": 1.25
+        },
+        {
+          "id": "core",
+          "label": "پله و آسانسور",
+          "type": "core",
+          "x": 0.0,
+          "y": 12.0,
+          "w": 3.25,
+          "h": 4.5
+        },
+        {
+          "id": "kitchen",
+          "label": "آشپزخانه",
+          "type": "kitchen",
+          "x": 3.25,
+          "y": 12.0,
+          "w": 3.25,
+          "h": 3.0
+        },
+        {
+          "id": "bath",
+          "label": "سرویس",
+          "type": "bath",
+          "x": 6.5,
+          "y": 12.0,
+          "w": 1.75,
+          "h": 2.25
+        }
+      ],
+      "metrics": {
+        "objective": 10.0,
+        "width_m": 10.0,
+        "depth_m": 13.0,
+        "unassigned_m2": 51.69
+      },
+      "hard_constraints": [
+        "no overlap",
+        "minimum dimensions",
+        "all three living/bedroom rooms touch exposed facade",
+        "all rooms touch real corridor band",
+        "kitchen/bath share wall",
+        "core has full depth"
+      ],
+      "not_checked": [
+        "real entrance and doors",
+        "actual window sizes and daylight",
+        "structure",
+        "parking",
+        "local building code",
+        "fire safety",
+        "plumbing",
+        "real stair/elevator geometry"
+      ],
+      "variant": "bedroom_1-living-bedroom_2"
+    },
+    {
+      "status": "OPTIMAL",
+      "rooms": [
+        {
+          "id": "bedroom_1",
+          "label": "خواب ۱",
+          "type": "bedroom",
+          "x": 0.0,
+          "y": 7.0,
+          "w": 3.0,
+          "h": 3.75
+        },
+        {
+          "id": "bedroom_2",
+          "label": "خواب ۲",
+          "type": "bedroom",
+          "x": 3.0,
+          "y": 7.0,
+          "w": 3.0,
+          "h": 3.75
+        },
+        {
+          "id": "living",
+          "label": "پذیرایی",
+          "type": "living",
+          "x": 6.0,
+          "y": 7.0,
+          "w": 4.0,
+          "h": 3.75
+        },
+        {
+          "id": "corridor",
+          "label": "راهرو",
+          "type": "corridor",
+          "x": 0.0,
+          "y": 10.75,
+          "w": 10.0,
+          "h": 1.25
+        },
+        {
+          "id": "core",
+          "label": "پله و آسانسور",
+          "type": "core",
+          "x": 0.0,
+          "y": 12.0,
+          "w": 3.25,
+          "h": 4.5
+        },
+        {
+          "id": "kitchen",
+          "label": "آشپزخانه",
+          "type": "kitchen",
+          "x": 6.75,
+          "y": 12.0,
+          "w": 2.5,
+          "h": 3.0
+        },
+        {
+          "id": "bath",
+          "label": "سرویس",
+          "type": "bath",
+          "x": 3.75,
+          "y": 12.0,
+          "w": 3.0,
+          "h": 2.25
+        }
+      ],
+      "metrics": {
+        "objective": 10.0,
+        "width_m": 10.0,
+        "depth_m": 13.0,
+        "unassigned_m2": 51.12
+      },
+      "hard_constraints": [
+        "no overlap",
+        "minimum dimensions",
+        "all three living/bedroom rooms touch exposed facade",
+        "all rooms touch real corridor band",
+        "kitchen/bath share wall",
+        "core has full depth"
+      ],
+      "not_checked": [
+        "real entrance and doors",
+        "actual window sizes and daylight",
+        "structure",
+        "parking",
+        "local building code",
+        "fire safety",
+        "plumbing",
+        "real stair/elevator geometry"
+      ],
+      "variant": "bedroom_1-bedroom_2-living"
+    }
+  ]
+}
